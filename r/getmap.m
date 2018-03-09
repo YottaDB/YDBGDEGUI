@@ -19,7 +19,6 @@ handle(RESULT,ARGS)
  ; there is a vaule set at a parent subscript
  ZK DATA("nams"),DATA("regs"),DATA("segs")
  ZK DATA("tmpseg","BG"),DATA("tmpseg","MM")
- m ^KBBO("getmap")=DATA
  D ENCODE^VPRJSON("DATA","JSON","ERR")
  I $D(ERR) D SETERROR^VPRJRUT("500","Error in JSON conversion") QUIT
  M RESULT=JSON
