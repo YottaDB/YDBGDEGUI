@@ -138,3 +138,9 @@ DUMP(getMapData)	;entry point to dump gde
 	n (getMapData) ; clear calling process M variable state (if any) so it does not interfere with GDE variable names - exclude var getMapData
 	s allerrs=0,debug=1,dump=1,runtime=0 u 0:(ctrap="":exception="") zb DBGCOMX,ABORT
 	g DBG
+WEB(portnum)	; entry point to start web based GDE editor
+	i $l($zcmdline)&($zcmdline=+$zcmdline) s portnum=$zcmdline
+	e  w "No port number specified, or invalid - using default of 8080",!
+	d:$l($t(^VPRJREQ)) JOB^VPRJREQ($g(portnum,8080))
+	w:'$l($t(^VPRJREQ)) "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
+	q

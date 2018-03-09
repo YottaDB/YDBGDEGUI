@@ -9,7 +9,7 @@ GO ; start up REST listener with defaults
  D JOB(PORT)
  QUIT
  ;
-JOB(PORT,TLSCONFIG) ; Convenience entry point
+JOB(PORT,TLSCONFIG,NOGBL) ; Convenience entry point
  I +$SY=47 J START^VPRJREQ(PORT,,$G(TLSCONFIG)):(IN="/dev/null":OUT="/dev/null":ERR="/dev/null"):5  ; no in and out files please.
  E  J START^VPRJREQ(PORT,"",$G(TLSCONFIG)) ; Cache can't accept an empty string in the second argument
  QUIT
@@ -21,7 +21,7 @@ START(TCPPORT,DEBUG,TLSCONFIG) ; set up listening for connections
  ; You can place breakpoints at CHILD+1 or anywhere else.
  ; CTRL-C will always work
  ;
- S ^VPRHTTP(0,"listener")="starting"
+ S:'$G(NOGBL) ^VPRHTTP(0,"listener")="starting"
  ;
  N %WOS S %WOS=$S(+$SY=47:"GT.M",+$SY=50:"MV1",1:"CACHE") ; Get Mumps Virtual Machine
  ;
@@ -41,7 +41,7 @@ START(TCPPORT,DEBUG,TLSCONFIG) ; set up listening for connections
  I %WOS="GT.M" O TCPIO:(LISTEN=TCPPORT_":TCP":delim=$C(13,10):attach="server"):15:"socket" E  U 0 W !,"error cannot open port "_TCPPORT Q
  ;
  ; K. Now we are really really listening.
- S ^VPRHTTP(0,"listener")="running"
+ S:'$G(NOGBL) ^VPRHTTP(0,"listener")="running"
  ;
  ; This is the same for GT.M and Cache
  U TCPIO
@@ -99,7 +99,7 @@ LOOP ; wait for connection, spawn process to handle it. GOTO favorite.
 DEBUG(TLSCONFIG) ; Debug continuation. We don't job off the request, rather run it now.
  ; Stop using Ctrl-C (duh!)
  N $ET S $ET="BREAK"
- K ^VPRHTTP("log") ; Kill log so that we can see our errors when they happen.
+ K:'$G(NOGBL) ^VPRHTTP("log") ; Kill log so that we can see our errors when they happen.
  I %WOS="GT.M" U $I:(CENABLE:ioerror="T")
  I %WOS="CACHE" F  R *X:10 I  G CHILDDEBUG
  I %WOS="GT.M" F  W /WAIT(10) I $KEY]"" G CHILDDEBUG
