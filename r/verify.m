@@ -13,7 +13,6 @@ handle(ARGS,BODY,RESULT)
  ;
  NEW JSON,RSLT,ERR,nams,regs,segs,tmpacc,tmpreg,tmpseg,minreg,maxreg,minseg,maxseg
  D DECODE^VPRJSON("BODY","JSON","ERR")
- M ^KBBO("JSON")=JSON
  ; NOTE: the object sent from the client doesn't contain the nams/regs/segs count component stored in the unsubscripted spot
  ; i.e. while GDE has locals like nams=2, regs=2, segs=1 storing the num of names/regions/segments, the client doesn't send that data back
  ; after changes on the client side which may change those numbers
