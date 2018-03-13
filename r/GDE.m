@@ -144,3 +144,10 @@ WEB(portnum)	; entry point to start web based GDE editor
 	d:$l($t(^VPRJREQ)) JOB^VPRJREQ($g(portnum,8080),,1)
 	w:'$l($t(^VPRJREQ)) "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
 	q
+STOP
+	n pid
+	s pid=""
+	f  s pid=$o(KBBO("JOBS",pid)) q:pid=""  d
+	. zsy "kill "_pid
+	. k KBBO("JOBS",pid)
+	q
