@@ -7,7 +7,7 @@ RESPOND ; find entry point to handle request and call it
  ; expects HTTPREQ, HTTPRSP is used to return the response
  ;
  ; TODO: check cache of HEAD requests first and return that if there?
- K ^TMP($J)
+ K:'$G(NOGBL) ^TMP($J)
  N ROUTINE,LOCATION,HTTPARGS,HTTPBODY
  I HTTPREQ("path")="/",HTTPREQ("method")="GET" D EN^%WHOME(.HTTPRSP) QUIT  ; Home page requested.
  D MATCH(.ROUTINE,.HTTPARGS) I $G(HTTPERR) QUIT  ; Resolve the URL and authenticate if necessary
@@ -321,8 +321,8 @@ UPD4DATA ;
  L -^VPRTMP(HASH)
  Q
 RSPERROR ; set response to be an error response
- D ENCODE^VPRJSON("^TMP(""HTTPERR"",$J,1)","^TMP(""HTTPERR"",$J,""JSON"")")
- S HTTPRSP="^TMP(""HTTPERR"",$J,""JSON"")"
+ D ENCODE^VPRJSON("TMP(""HTTPERR"",$J,1)","TMP(""HTTPERR"",$J,""JSON"")")
+ S HTTPRSP="TMP(""HTTPERR"",$J,""JSON"")"
  K HTTPRSP("pageable")
  Q
 RSPLINE() ; writes out a response line based on HTTPERR
