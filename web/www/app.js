@@ -590,7 +590,7 @@ window.onload = function() {
         console.log(responseObj);
 	//TODO update the graph
       } else if (this.readyState == 4 && xmlHttp.status != 200) {
-        toastr.error("Verify encountered server error: Http status " + xmlHttp.status);
+        toastr.error("Save encountered server error: Http status " + xmlHttp.status);
       }
       $('#blocker').dialog('close');
     }
