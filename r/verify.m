@@ -22,6 +22,7 @@ handle(ARGS,BODY,RESULT)
  M tmpacc=JSON("tmpacc")
  M tmpreg=JSON("tmpreg")
  M tmpseg=JSON("tmpseg")
+ M gnams=JSON("gnams") ;AKB 2018-03 not 100% sure if this data is necessary
  D GDEINIT^GDEINIT
  D GDEMSGIN^GDEMSGIN
  I $$ALL^GDEVERIF S RSLT("verifyStatus")="success"
