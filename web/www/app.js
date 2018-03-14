@@ -118,7 +118,9 @@ window.onload = function() {
       model.regs[nodeNameString] = {};
       model.regs[nodeNameString].DYNAMIC_SEGMENT = "";
       Object.keys(model.tmpreg).map(propertyName => {
-        model.regs[nodeNameString][propertyName] = model.tmpreg[propertyName];
+	if (propertyName !== "") {
+          model.regs[nodeNameString][propertyName] = model.tmpreg[propertyName];
+	}
       });
     } else if (nodeInfo.modelField === "segs") {
       if (Object.keys(model.segs).map(s => s.toUpperCase()).includes(nodeNameString.toUpperCase())) { //TODO encapsulate
@@ -138,7 +140,9 @@ window.onload = function() {
       model.segs[nodeNameString].FILE_NAME = "";
       let segmentTemplate = model.tmpseg[model.tmpacc];
       Object.keys(segmentTemplate).map(propertyName => {
-        model.segs[nodeNameString][propertyName] = segmentTemplate[propertyName];
+	if (propertyName !== "") { //property with name "" seems to contain value "DEFAULT" for both BG and MM - what is its purpose?
+          model.segs[nodeNameString][propertyName] = segmentTemplate[propertyName];
+	}
       });
     } else throw "nodeInfo.modelField not recognized: " + nodeInfo.modelField;
 
@@ -350,8 +354,25 @@ window.onload = function() {
         model.maxreg = responseObj.maxreg;
         model.minseg = responseObj.minseg;
         model.maxseg = responseObj.maxseg;
+	model.gnams = responseObj.gnams;
+	model.create = responseObj.create;
+	model.file = responseObj.file;
+	model.useio = responseObj.useio;
+	model.debug = responseObj.debug;
 
-        const namesArray = Object.keys(nams); //todo: true immutability?
+        //const namesArray = Object.keys(nams); //TODO: true immutability?
+	/*const namesArray = Object.values(
+		             Object.keys(nams).reduce((rv, nam) => {(rv[nams[nam]] = rv[nams[nam]] || []).push(nam); return rv;}, {}) //group names by region
+                           ).reduce((xs, ys) => xs.concat(ys), []); //group-by returns map of regions to arrays of names; concatenate the arrays */
+        let namesArray = [];
+        const namesGroupedByRegion = Object.keys(nams).reduce(
+	  (rv, nam) => {
+	    (rv[nams[nam]] = rv[nams[nam]] || []).push(nam);
+	    return rv;
+	  }, {}
+	);
+        Object.keys(namesGroupedByRegion).sort().forEach(region => namesArray = namesArray.concat(namesGroupedByRegion[region]));
+	  //populate namesArray by region alphabetical order, and in name alphabetical order within each region
         const regionsArray = Object.keys(regs);
         const segmentsArray = Object.keys(segs);
         //TODO: make sure that region/segment parameter names indeed show up on the JS side in uppercase
@@ -504,6 +525,7 @@ window.onload = function() {
     sendObj.tmpreg = model.tmpreg;
     sendObj.tmpseg = model.tmpseg;
     sendObj.tmpacc = model.tmpacc;
+    sendObj.gnams = model.gnams;
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", "verify", true);
     xmlHttp.onreadystatechange = function() {
@@ -550,6 +572,11 @@ window.onload = function() {
     sendObj.tmpreg = model.tmpreg;
     sendObj.tmpseg = model.tmpseg;
     sendObj.tmpacc = model.tmpacc;
+    sendObj.gnams = model.gnams;
+    sendObj.create = model.create;
+    sendObj.file = model.file;
+    sendObj.useio = model.useio;
+    sendObj.debug = model.debug;
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", "save", true);
     xmlHttp.onreadystatechange = function() {
@@ -561,6 +588,7 @@ window.onload = function() {
           return;
         }
         console.log(responseObj);
+	//TODO update the graph
       } else if (this.readyState == 4 && xmlHttp.status != 200) {
         toastr.error("Verify encountered server error: Http status " + xmlHttp.status);
       }
@@ -751,3 +779,5 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //TODO better graph organization - what algorithm? minimize total line distance? minimize sum of squares of line distances? group by names by region? re-render button for simplifying graph after adding or deleting nodes and/or re-render on add/delete?
 //-region/segment/file spacing scaling factor? on draw/add/delete events for non-name nodes
 //-also an x-scaling factor
+//
+//GETOUT^GDEEXIT when connection closes?

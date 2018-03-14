@@ -54,6 +54,11 @@ DBG:	;transfer point for DEBUG and "runtime" %gde
         .merge getMapData("maxreg")=maxreg
         .merge getMapData("minseg")=minseg
         .merge getMapData("maxseg")=maxseg
+	.merge getMapData("gnams")=gnams
+	.merge getMapData("create")=create
+	.merge getMapData("file")=file
+	.merge getMapData("useio")=useio ;2018-03 AKB - can this be eliminated on the client? it looks like it's just "io"
+	.merge getMapData("debug")=debug
 	;.if $ZJOBEXAM() ;DEBUG -remove
 	i debug s prompt="DEBUGDE>",uself="logfile"
 	e  s prompt="GDE>",uself="logfile:(ctrap=$c(3,25,26):exception=""d CTRL^GDE"")"
