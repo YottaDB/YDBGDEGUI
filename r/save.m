@@ -53,6 +53,7 @@ handle()
   . . ;merge getMapData("nams")=nams
   . . ;merge getMapData("regs")=regs
   . . ;merge getMapData("segs")=segs
+  . . set getMapData=""
   e  s verifySaveStatus="failure",getMapData="" ;null value instead of empty string for getMapData?
   ;do GETOUT^GDEEXIT ;this ends with a zgoto 0? - how to properly get out of gde? gdeentrystate being saved properly?
   set responseObj("verifySaveStatus")=verifySaveStatus

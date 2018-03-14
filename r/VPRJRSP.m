@@ -355,6 +355,7 @@ URLMAP ; map URLs to entry points (HTTP methods handled within entry point)
  ;;GET app.js FILESYS^%W0
  ;;GET getmap handle^getmap
  ;;POST verify handle^verify
+ ;;POST save handle^save
  ;;POST vpr/{pid?1.N} PUTOBJ^VPRJPR
  ;;PUT vpr/{pid?1.N} PUTOBJ^VPRJPR
  ;;GET vpr/{pid?1.N}/index/{indexName} INDEX^VPRJPR
