@@ -321,8 +321,8 @@ UPD4DATA ;
  L -^VPRTMP(HASH)
  Q
 RSPERROR ; set response to be an error response
- D ENCODE^VPRJSON("TMP(""HTTPERR"",$J,1)","TMP(""HTTPERR"",$J,""JSON"")")
- S HTTPRSP="TMP(""HTTPERR"",$J,""JSON"")"
+ D ENCODE^VPRJSON("^TMP(""HTTPERR"",$J,1)","^TMP(""HTTPERR"",$J,""JSON"")")
+ S HTTPRSP="^TMP(""HTTPERR"",$J,""JSON"")"
  K HTTPRSP("pageable")
  Q
 RSPLINE() ; writes out a response line based on HTTPERR

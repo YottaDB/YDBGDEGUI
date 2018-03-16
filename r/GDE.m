@@ -146,7 +146,7 @@ DUMP(getMapData)	;entry point to dump gde
 WEB(portnum)	; entry point to start web based GDE editor
 	i $l($zcmdline)&($zcmdline=+$zcmdline) s portnum=$zcmdline
 	i '$l(portnum)  w "No port number specified, or invalid - using default of 8080",!
-	d:$l($t(^VPRJREQ)) JOB^VPRJREQ($g(portnum,8080),,1)
+	d:$l($t(^VPRJREQ)) JOB^VPRJREQ($g(portnum,8080))
 	w:'$l($t(^VPRJREQ)) "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
 	q
 STOP
