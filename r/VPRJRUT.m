@@ -161,14 +161,14 @@ SETERROR(ERRCODE,MESSAGE,ERRARRAY) ; set error info into ^TMP("HTTPERR",$J)
  I ERRCODE>500 S HTTPERR=500,TOPMSG="Internal Server Error"  ; M Server Error
  I ERRCODE<500,ERRCODE>400 S HTTPERR=ERRCODE,TOPMSG=ERRNAME  ; Other HTTP Errors 
  S NEXTERR=$G(TMP("HTTPERR",$J,0),0)+1,TMP("HTTPERR",$J,0)=NEXTERR
- S TMP("HTTPERR",$J,1,"apiVersion")="1.0"
- S TMP("HTTPERR",$J,1,"error","code")=HTTPERR
- S TMP("HTTPERR",$J,1,"error","message")=TOPMSG
- S TMP("HTTPERR",$J,1,"error","request")=$G(HTTPREQ("method"))_" "_$G(HTTPREQ("path"))_" "_$G(HTTPREQ("query"))
- I $D(ERRARRAY) M TMP("HTTPERR",$J,1,"error","errors",NEXTERR)=ERRARRAY  ; VEN/SMH
- E  S TMP("HTTPERR",$J,1,"error","errors",NEXTERR,"reason")=ERRCODE
- E  S TMP("HTTPERR",$J,1,"error","errors",NEXTERR,"message")=ERRNAME
- I $L($G(MESSAGE)) S TMP("HTTPERR",$J,1,"error","errors",NEXTERR,"domain")=MESSAGE
+ S ^TMP("HTTPERR",$J,1,"apiVersion")="1.0"
+ S ^TMP("HTTPERR",$J,1,"error","code")=HTTPERR
+ S ^TMP("HTTPERR",$J,1,"error","message")=TOPMSG
+ S ^TMP("HTTPERR",$J,1,"error","request")=$G(HTTPREQ("method"))_" "_$G(HTTPREQ("path"))_" "_$G(HTTPREQ("query"))
+ I $D(ERRARRAY) M ^TMP("HTTPERR",$J,1,"error","errors",NEXTERR)=ERRARRAY  ; VEN/SMH
+ E  S ^TMP("HTTPERR",$J,1,"error","errors",NEXTERR,"reason")=ERRCODE
+ E  S ^TMP("HTTPERR",$J,1,"error","errors",NEXTERR,"message")=ERRNAME
+ I $L($G(MESSAGE)) S ^TMP("HTTPERR",$J,1,"error","errors",NEXTERR,"domain")=MESSAGE
  Q
  ;
  ; Cache specific functions (selected one support GT.M too!)
