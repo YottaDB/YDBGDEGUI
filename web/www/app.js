@@ -359,6 +359,7 @@ window.onload = function() {
 	model.file = responseObj.file;
 	model.useio = responseObj.useio;
 	model.debug = responseObj.debug;
+	model.io = responseObj.io;
 
         //const namesArray = Object.keys(nams); //TODO: true immutability?
 	/*const namesArray = Object.values(
@@ -577,6 +578,7 @@ window.onload = function() {
     sendObj.file = model.file;
     sendObj.useio = model.useio;
     sendObj.debug = model.debug;
+    sendObj.io = model.io;
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", "save", true);
     xmlHttp.onreadystatechange = function() {
