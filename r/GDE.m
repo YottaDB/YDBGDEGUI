@@ -60,7 +60,6 @@ DBG:	;transfer point for DEBUG and "runtime" %gde
 	.merge getMapData("useio")=useio ;2018-03 AKB - can this be eliminated on the client? it looks like it's just "io"
 	.merge getMapData("debug")=debug
 	.merge getMapData("io")=io ;2018-03 AKB - concerned about how many variables I'm passing between client and server. Seems hacky. What if useio no longer contains "io"? Would the program try to reference an undefined variable whose name is stored in useio? Might be better to keep around all variables from GDE, but how?
-	;.if $ZJOBEXAM() ;DEBUG -remove
 	i debug s prompt="DEBUGDE>",uself="logfile"
 	e  s prompt="GDE>",uself="logfile:(ctrap=$c(3,25,26):exception=""d CTRL^GDE"")"
 	e  s useio="io:(ctrap=$c(3,25,26):exception=""d CTRL^GDE"")"
