@@ -9,10 +9,8 @@
 
 window.onload = function() {
 
-  //TODO Sam Habiel's extra parameter suggestion?
   //should I try to grab the initial map data when the server sends the html data, or is doing it in a separate toplevel request in window.onload an okay program flow? - can ask Sam and the internet in general
   //activate node hover when mouse is over the label and not the node?
-  //storing, retrieving, and updating data associated with regions, segments, etc. like memory allocation
 
 
   //Global Vars
@@ -167,6 +165,8 @@ window.onload = function() {
   document.getElementById("deleteNodeConfirmBtn").onclick = function(e) {
     const nodeToDeleteId = $("#clicknode-dialog").data("node-id");
     const nodeToDeleteLabel = $("#clicknode-dialog").data("node-label");
+    //if deleting a segment node would remove the last link to a file node, that file node needs to be deleted
+    let linkedFileNodeLabel = undefined; //initialized later in segment node handling block if a linked file node is present
     //update model
     //this way of determining node type is fragile - should try to correct it when possible
     const nodeIdPrefix = nodeToDeleteId.substring(0, 1);
@@ -180,6 +180,7 @@ window.onload = function() {
         }
       });
     } else if (nodeIdPrefix === 's') {
+      linkedFileNodeLabel = model.segs[nodeToDeleteLabel].FILE_NAME; //this field might be undefined
       delete model.segs[nodeToDeleteLabel];
       Object.keys(model.regs).map(reg => {
         if (segmentLabelEqual(model.regs[reg].DYNAMIC_SEGMENT, nodeToDeleteLabel)) {
@@ -209,6 +210,20 @@ window.onload = function() {
       size: 1,
       color: '#00f',
     });*/
+
+    //if linked file node label is defined and there are no more links to that file node after deleting the segment node, delete the file node
+    if (undefined !== linkedFileNodeLabel) {
+      const linkedFileNodeWrapped = sig.graph.nodes().filter(node => node.id.substring(0, 1) === 'f' && node.label === linkedFileNodeLabel);
+      if (linkedFileNodeWrapped.length === 0) {
+        toastr.error("Could not find file node labeled " + linkedFileNodeLabel);
+	return;
+      }
+      const linkedFileNodeId = linkedFileNodeWrapped[0].id;
+      if (sig.graph.edges().filter(edge => edge.target === linkedFileNodeId).length === 0)
+	sig.graph.dropNode(linkedFileNodeId);
+      //not readjusting y-positioning of remaining file nodes
+    }
+
     sig.refresh();
   }
 
@@ -253,6 +268,7 @@ window.onload = function() {
     }
 
     $("#changelink-dialog").dialog('close');
+    $("#clicknode-dialog").dialog("close");
 
     //update view
     const outEdgeWrapped = sig.graph.edges().filter(edge => edge.source === thisNodeId);
@@ -306,8 +322,8 @@ window.onload = function() {
           sig.graph.addNode({
             id: targetNodeId,
             label: linkTargetLabel,
-            x: 3, //should centralize this, along with size and color
-            y: fileNodes.length,
+            x: 4 * view.xScalingFactor, //should centralize this (the "magic number" numerical portion i.e. 4), along with size and color
+            y: fileNodes.length - 1 + view.yScalingFactor,
             size: 1,
             color: '#000',
           });
@@ -664,17 +680,17 @@ window.onload = function() {
     } else if (type === "region") {
       nodeInfo.modelField = "regs";
       nodeInfo.prefix = "r";
-      nodeInfo.x = 1;
+      nodeInfo.x = 2;
       nodeInfo.color = '#00f';
     } else if (type === "segment") {
       nodeInfo.modelField = "segs";
       nodeInfo.prefix = "s";
-      nodeInfo.x = 2;
+      nodeInfo.x = 3;
       nodeInfo.color = '#0f0';
     }
     /*else if (type === "file") {
       nodeInfo.prefix = "f";
-      nodeInfo.x = 3;
+      nodeInfo.x = 4;
       nodeInfo.color = '#000';
     }*/
     else {
@@ -767,6 +783,8 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //-if it is deletable, special way of having to re-create?
 //-special error message for trying to create duplicate # name node, since model name doesn't match display name? something like "#, which represents local locks, already exists"
 //-also make * un-deletable?
+//
+//what is nams("%Y*")="default"? (save route)
 
 //need to separate model and view code
 
@@ -774,12 +792,17 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //simply convert DataBallet globals to locals? -changed TMP, CACHE, and SESSION (there might be more) - stopping DataBallet was abnormal - UI displayed map for original GLD, failed to display when switching to acct.gld - need to figure out why
 //check out Sam's web server code
 
-//TODO remove r/userconf.m from git repo
-//
 //TODO clean stop, accept only one connection, template modification (JS side), save/verify, changes to GDE - where do they get saved? (-work locally now, merge into YottaDB repo later), load and test more glds
 //TODO better handling of large numbers of graph nodes
 //TODO better graph organization - what algorithm? minimize total line distance? minimize sum of squares of line distances? group by names by region? re-render button for simplifying graph after adding or deleting nodes and/or re-render on add/delete?
 //-region/segment/file spacing scaling factor? on draw/add/delete events for non-name nodes
 //-also an x-scaling factor
+//-animation?
 //
 //GETOUT^GDEEXIT when connection closes?
+//
+//TODO test if it's possible to hit Esc to dismiss the blocker dialog, and disable that functionality if present
+//TODO convert added regions/segments to uppercase in the client side add node function, or display an error if user attempts to enter any lowercase text
+//TODO implement behavior for saving a correct state (i.e. send map back and re-draw the graph) and saving an incorrect state (specific verification error)
+//
+//problem with GDE revealed - can submit a variable set that passes verification but not saving (e.g. lowercase regions/segments)
