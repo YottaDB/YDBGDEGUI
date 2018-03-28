@@ -166,7 +166,7 @@ window.onload = function() {
     const nodeToDeleteId = $("#clicknode-dialog").data("node-id");
     const nodeToDeleteLabel = $("#clicknode-dialog").data("node-label");
     //if deleting a segment node would remove the last link to a file node, that file node needs to be deleted
-    let linkedFileNodeLabel = undefined; //initialized later in segment node handling block if a linked file node is present
+    let linkedFileNodeLabel = undefined; //initialized later in segment node handling block
     //update model
     //this way of determining node type is fragile - should try to correct it when possible
     const nodeIdPrefix = nodeToDeleteId.substring(0, 1);
@@ -180,7 +180,7 @@ window.onload = function() {
         }
       });
     } else if (nodeIdPrefix === 's') {
-      linkedFileNodeLabel = model.segs[nodeToDeleteLabel].FILE_NAME; //this field might be undefined
+      linkedFileNodeLabel = model.segs[nodeToDeleteLabel].FILE_NAME; //this field might be an empty string; could it also be undefined?
       delete model.segs[nodeToDeleteLabel];
       Object.keys(model.regs).map(reg => {
         if (segmentLabelEqual(model.regs[reg].DYNAMIC_SEGMENT, nodeToDeleteLabel)) {
@@ -212,7 +212,7 @@ window.onload = function() {
     });*/
 
     //if linked file node label is defined and there are no more links to that file node after deleting the segment node, delete the file node
-    if (undefined !== linkedFileNodeLabel) {
+    if (undefined !== linkedFileNodeLabel && "" !== linkedFileNodeLabel) {
       const linkedFileNodeWrapped = sig.graph.nodes().filter(node => node.id.substring(0, 1) === 'f' && node.label === linkedFileNodeLabel);
       if (linkedFileNodeWrapped.length === 0) {
         toastr.error("Could not find file node labeled " + linkedFileNodeLabel);
@@ -533,7 +533,7 @@ window.onload = function() {
   }
 
   //don't think this needs forced synchrony - just Save function
-  //TODO print proper error message to screen; speed up latency? (server side, I think)
+  //TODO print proper error message to screen
   document.getElementById('verifyBtn').onclick = function(e) {
     var sendObj = {};
     sendObj.nams = model.nams;
@@ -605,8 +605,22 @@ window.onload = function() {
           $('#blocker').dialog('close');
           return;
         }
-        console.log(responseObj);
-	//TODO update the graph
+
+        if (responseObj.verifySaveStatus === "failure") {
+          $('#blocker').dialog('close');
+	  toastr.error("Verification or save failure");
+	  return;
+	}
+
+	console.log(responseObj);
+
+	//update the model
+	model.nams = responseObj.getMapData.nams;
+	model.regs = responseObj.getMapData.regs;
+	model.segs = responseObj.getMapData.segs;
+
+	//update the view
+	console.log("TODO"); //TODO refactor with getMap?
       } else if (this.readyState == 4 && xmlHttp.status != 200) {
         toastr.error("Save encountered server error: Http status " + xmlHttp.status);
       }

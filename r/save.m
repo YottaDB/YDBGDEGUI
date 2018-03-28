@@ -11,6 +11,7 @@
 save ;;save the new GDE local state obtained from the client
 handle(ARGS,BODY,RESULT)
   ;
+  kill ^ashokvar ;DEBUG remove
   new JSON,RSLT,ERR
   do DECODE^VPRJSON("BODY","JSON","ERR")
   new verifySaveStatus
@@ -57,20 +58,27 @@ handle(ARGS,BODY,RESULT)
   . ; do DUMP^GDE(.getMapData)
   . ;
   . ;
-  . ;Similar to what happens in the getmap route - should they be refactored?
   . ;
   . kill getMapData
   . merge getMapData("nams")=nams
   . merge getMapData("regs")=regs
   . merge getMapData("segs")=segs
-  . ;TODO test that name/region transformations on the server are properly captured by these merges
-  . ;TODO handling lowercase regs and segs, nams that map to lowercase regs
-  . ;set getMapData=""
+  . zkill getMapData("nams"),getMapData("regs"),getMapData("segs")
+  .
+  . ;stats db cleanup for nams - if getMapData("nams") contains a binding from a name to a region where the region has lowercase characters, delete the binding
+  . set next=$order(getMapData("nams","")) for  set x=next quit:x=""  do
+  . . set next=$order(getMapData("nams",x))
+  . . if getMapData("nams",x)'=$$FUNC^%UCASE(getMapData("nams",x)) kill getMapData("nams",x)
+  . 
+  . ;stats db cleanup for regs and segs - delete getMapData("regs",x) and getMapData("segs",x) where x is a region or segment that has lowercase characters
+  . set next=$order(getMapData("regs","")) for  set x=next quit:x=""  do
+  . . set next=$order(getMapData("regs",x))
+  . . if x'=$$FUNC^%UCASE(x) kill getMapData("regs",x)
+  . set next=$order(getMapData("segs","")) for  set x=next quit:x=""  do
+  . . set next=$order(getMapData("segs",x))
+  . . if x'=$$FUNC^%UCASE(x) kill getMapData("segs",x)
   e  s verifySaveStatus="failure",getMapData="" ;null value instead of empty string for getMapData?
-  ;do GETOUT^GDEEXIT ;this ends with a zgoto 0? - how to properly get out of gde? gdeentrystate being saved properly?
   set RSLT("verifySaveStatus")=verifySaveStatus
   merge RSLT("getMapData")=getMapData
-  kill ^ashokvar merge ^ashokvar=RSLT("getMapData") ;DEBUG remove
   do ENCODE^VPRJSON("RSLT","RESULT","ERR")
-  kill ^ashokvar merge ^ashokvar=RESULT ;DEBUG remove
   quit ""
