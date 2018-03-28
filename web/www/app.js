@@ -377,10 +377,12 @@ window.onload = function() {
 	model.debug = responseObj.debug;
 	model.io = responseObj.io;
 
+	drawGraph(nams, regs, segs);
         //const namesArray = Object.keys(nams); //TODO: true immutability?
 	/*const namesArray = Object.values(
 		             Object.keys(nams).reduce((rv, nam) => {(rv[nams[nam]] = rv[nams[nam]] || []).push(nam); return rv;}, {}) //group names by region
                            ).reduce((xs, ys) => xs.concat(ys), []); //group-by returns map of regions to arrays of names; concatenate the arrays */
+	/*moved to function drawGraph()
         let namesArray = [];
         const namesGroupedByRegion = Object.keys(nams).reduce(
 	  (rv, nam) => {
@@ -485,44 +487,8 @@ window.onload = function() {
             target: fileId,
           });
         });
-        /* old version of the code where things were in simple name-region, region-segment, and segment-file maps
-        for (let name in namRegMap) {
-          if (namRegMap.hasOwnProperty(name)) {
-            let nameId = nameIds[name];
-            //todo: error/exception handling if for some reason the name-region map has a region value that is not in the region-segment map keys
-            let regionId = regionIds[namRegMap[name]];
-            sig.graph.addEdge({
-              id: nameId+'-'+regionId,
-              source: nameId,
-              target: regionId,
-            });
-          }
-        }
-        for (let region in regSegMap) {
-          if (regSegMap.hasOwnProperty(region)) {
-            let regionId = regionIds[region];
-            //todo: error/exception handling if for some reason the region-segment map has a segment value that is not in the segment-file map keys
-            let segmentId = segmentIds[regSegMap[region]];
-            sig.graph.addEdge({
-              id: regionId+'-'+segmentId,
-              source: regionId,
-              target: segmentId,
-            });
-          }
-        }
-        for (let segment in segFileMap) {
-          if (segFileMap.hasOwnProperty(segment)) {
-            let segmentId = segmentIds[segment];
-            let fileId = fileIds[segFileMap[segment]];
-            sig.graph.addEdge({
-              id: segmentId+'-'+fileId,
-              source: segmentId,
-              target: fileId,
-            });
-          }
-        }
-        */
         sig.refresh();
+	*/
       } else if (this.readyState == 4 && xmlHttp.status != 200) {
         toastr.error("unsuccessful: Http status " + xmlHttp.status);
       }
@@ -620,7 +586,7 @@ window.onload = function() {
 	model.segs = responseObj.getMapData.segs;
 
 	//update the view
-	console.log("TODO"); //TODO refactor with getMap?
+	drawGraph(model.nams, model.regs, model.segs);
       } else if (this.readyState == 4 && xmlHttp.status != 200) {
         toastr.error("Save encountered server error: Http status " + xmlHttp.status);
       }
@@ -628,6 +594,117 @@ window.onload = function() {
     }
     xmlHttp.setRequestHeader("Content-Type", "application/json");
     xmlHttp.send(JSON.stringify(sendObj));
+  }
+
+  //this function should not change nams, regs, or segs
+  function drawGraph(nams, regs, segs) {
+    sig.graph.clear();
+
+    let namesArray = [];
+    const namesGroupedByRegion = Object.keys(nams).reduce(
+      (rv, nam) => {
+        (rv[nams[nam]] = rv[nams[nam]] || []).push(nam);
+        return rv;
+      }, {}
+    );
+    Object.keys(namesGroupedByRegion).sort().forEach(region => namesArray = namesArray.concat(namesGroupedByRegion[region]));
+      //populate namesArray by region alphabetical order, and in name alphabetical order within each region
+    const regionsArray = Object.keys(regs);
+    const segmentsArray = Object.keys(segs);
+    //TODO: make sure that region/segment parameter names indeed show up on the JS side in uppercase
+    //is the filter undefined operation here redundant? (i.e. if undefined segment-file associations are being treated as an error and handled elsewhere, like in the edge-drawing code in this function)
+    const filesArray = Array.from(new Set(segmentsArray.map(seg => segs[seg].FILE_NAME))).filter(file => file != undefined) //Array.from(new Set(Object.values(segFileMap)));
+    view.xScalingFactor = Math.max(1, namesArray.length / 3)
+    view.yScalingFactor = Math.max(1, namesArray.length / regionsArray.length);
+    const nameIds = {}; //cannot use name/region/etc. strings as sigma element ids due to possible duplicates
+    const regionIds = {};
+    const segmentIds = {};
+    const fileIds = {};
+    for (let i = 0; i < namesArray.length; ++i) {
+      let nameId = "n" + i;
+      nameIds[namesArray[i]] = nameId;
+      sig.graph.addNode({
+        id: nameId,
+        label: namesArray[i],
+        x: 0 * view.xScalingFactor,
+        y: i,
+        size: 1,
+        color: '#f00',
+      });
+    }
+    for (let i = 0; i < regionsArray.length; ++i) {
+      let regionId = "r" + i;
+      regionIds[regionsArray[i]] = regionId;
+      sig.graph.addNode({
+        id: regionId,
+        label: regionsArray[i],
+        x: 2 * view.xScalingFactor,
+        y: i * view.yScalingFactor,
+        size: 1,
+        color: '#00f',
+      });
+    }
+    for (let i = 0; i < segmentsArray.length; ++i) {
+      let segmentId = "s" + i;
+      segmentIds[segmentsArray[i]] = segmentId;
+      sig.graph.addNode({
+        id: segmentId,
+        label: segmentsArray[i],
+        x: 3 * view.xScalingFactor,
+        y: i * view.yScalingFactor,
+        size: 1,
+        color: '#0f0',
+      });
+    }
+    for (let i = 0; i < filesArray.length; ++i) {
+      let fileId = "f" + i;
+      fileIds[filesArray[i]] = fileId;
+      sig.graph.addNode({
+        id: fileId,
+        label: filesArray[i],
+        x: 4 * view.xScalingFactor,
+        y: i * view.yScalingFactor,
+        size: 1,
+        color: '#000',
+      });
+    }
+    namesArray.map(nam => {
+      let nameId = nameIds[nam];
+      //error/exception handling if for some reason the name-region mapping contains a nonexistent region
+      let regionId = regionIds[nams[nam]];
+      if (regionId === undefined) throw "Nonexistent region " + nams[nam] + " for name " + nam;
+      sig.graph.addEdge({
+        id: nameId + '-' + regionId,
+        source: nameId,
+        target: regionId,
+      });
+    });
+    regionsArray.map(reg => {
+      let regionId = regionIds[reg];
+      //error/exception handling if for some reason the region-segment mapping contains a nonexistent segment or if the segment is missing
+      let seg = regs[reg].DYNAMIC_SEGMENT;
+      if (seg === undefined) throw "Missing segment for region " + reg;
+      let segmentId = segmentIds[seg];
+      if (segmentId === undefined) throw "Nonexistent segment " + seg + " for region " + reg;
+      sig.graph.addEdge({
+        id: regionId + '-' + segmentId,
+        source: regionId,
+        target: segmentId,
+      });
+    });
+    segmentsArray.map(seg => {
+      let segmentId = segmentIds[seg];
+      //error/exception handling if for some region a segment is missing an associated file (There won't be a nonexistent file here since the file list is obtained by grabbing all segment FILE_NAME values)
+      let file = segs[seg].FILE_NAME;
+      if (file === undefined) throw "Missing file for segment " + seg;
+      let fileId = fileIds[file];
+      sig.graph.addEdge({
+        id: segmentId + '-' + fileId,
+        source: segmentId,
+        target: fileId,
+      });
+    });
+    sig.refresh();
   }
 
   sig.bind('clickNode', function(e) {
@@ -817,6 +894,6 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //
 //TODO test if it's possible to hit Esc to dismiss the blocker dialog, and disable that functionality if present
 //TODO convert added regions/segments to uppercase in the client side add node function, or display an error if user attempts to enter any lowercase text
-//TODO implement behavior for saving a correct state (i.e. send map back and re-draw the graph) and saving an incorrect state (specific verification error)
+//TODO implement behavior for saving an incorrect state (specific verification error)
 //
 //problem with GDE revealed - can submit a variable set that passes verification but not saving (e.g. lowercase regions/segments)
