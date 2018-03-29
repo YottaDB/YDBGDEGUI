@@ -9,7 +9,7 @@
 
 window.onload = function() {
 
-  //should I try to grab the initial map data when the server sends the html data, or is doing it in a separate toplevel request in window.onload an okay program flow? - can ask Sam and the internet in general
+  //should I try to grab the initial map data when the server sends the html data, or is doing it in a separate toplevel request in window.onload an okay program flow?
   //activate node hover when mouse is over the label and not the node?
 
 
@@ -71,8 +71,7 @@ window.onload = function() {
 
   //TODO: separate UI elements for adding name/region/segment(/file)?
   document.getElementById("addNodeConfirmBtn").onclick = function(e) {
-    //fixed region string: "mammals" - when checking against existing nodes, how should it handle case sensitivity?
-    //current plan 2018-01-22 - don't handle it at all on the client side, have the server check it - possible avenue of optimization is to check on client side?
+    //when checking against existing nodes, how should it handle case sensitivity?
     //case sensitivity is different for different node types e.g. regions is insensitive, files are not - also, it might depend based on the OS - Bhaskar says files are case-sensitive across OSes
     //need to check specifics
     let nodeType = document.getElementById("addNodeTypeBox").value; //TODO sanitize this?, and other user input - here, on the server, or both? -check if multi-sanitization is okay/doesn't alter the semantic content
@@ -347,7 +346,7 @@ window.onload = function() {
     xmlHttp.open("GET", "getmap", true);
     xmlHttp.onreadystatechange = function() {
       if (this.readyState == 4 && xmlHttp.status == 200) {
-        //todo: JSON.parse error handling
+        //TODO: JSON.parse error handling
         const responseObj = JSON.parse(xmlHttp.responseText);
         if (false) { //check that nams, regs, segs, and other vars were obtained
           //handle error
@@ -545,7 +544,7 @@ window.onload = function() {
     xmlHttp.send(JSON.stringify(sendObj));
   }
 
-  //needs forced synchrony
+  //forced synchrony
   document.getElementById('saveBtn').onclick = function(e) {
     $('#blocker').dialog('open');
     var sendObj = {};
@@ -856,7 +855,6 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //-how to handle asynchrony/changes made between requesting a verify/save and getting a success/fail response from the server - force synchrony?
 
 //M mode vs UTF-8 mode? TODO (defer until after prototype?)
-//"sig.kill" on reloading graph?
 //make sure on the M side to allow only one connection after startup, and only keep-alive connections
 
 //differences between empty string and no value for GDE locals?
@@ -881,7 +879,6 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 
 //DataBallet uses globals for scratch space - this can't happen in production
 //simply convert DataBallet globals to locals? -changed TMP, CACHE, and SESSION (there might be more) - stopping DataBallet was abnormal - UI displayed map for original GLD, failed to display when switching to acct.gld - need to figure out why
-//check out Sam's web server code
 
 //TODO clean stop, accept only one connection, template modification (JS side), save/verify, changes to GDE - where do they get saved? (-work locally now, merge into YottaDB repo later), load and test more glds
 //TODO better handling of large numbers of graph nodes
@@ -892,8 +889,8 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //
 //GETOUT^GDEEXIT when connection closes?
 //
-//TODO test if it's possible to hit Esc to dismiss the blocker dialog, and disable that functionality if present
+//it's possible to hit Esc to dismiss the blocker dialog - can and should this be disabled?
 //TODO convert added regions/segments to uppercase in the client side add node function, or display an error if user attempts to enter any lowercase text
 //TODO implement behavior for saving an incorrect state (specific verification error)
 //
-//problem with GDE revealed - can submit a variable set that passes verification but not saving (e.g. lowercase regions/segments)
+//maybe GDE issue? - can submit a variable set that passes verification but not saving (e.g. lowercase regions/segments)
