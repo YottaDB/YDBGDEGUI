@@ -12,10 +12,11 @@ save ;;save the new GDE local state obtained from the client
 handle(ARGS,BODY,RESULT)
   ;
   kill ^ashokvar ;DEBUG remove
+  ;s ^ashokvar="entry" ;DEBUG remove
   new JSON,RSLT,ERR
   do DECODE^VPRJSON("BODY","JSON","ERR")
   new verifySaveStatus
-  new nams,regs,segs,tmpacc,tmpreg,tmpseg,gnams,create,file,useio,debug,io
+  new nams,regs,segs,tmpacc,tmpreg,tmpseg,gnams,create,file,useio,debug,io,inst
   merge nams=JSON("nams") ;NOTE: the object sent from the client doesn't contain the nams/regs/segs count component stored in the unsubscripted spot
                           ;i.e. while GDE has locals like nams=2, regs=2, segs=1 storing the num of names/regions/segments, the client doesn't send that data back
                           ;after changes on the client side which may change those numbers
@@ -48,9 +49,11 @@ handle(ARGS,BODY,RESULT)
   merge useio=JSON("useio") ;2018-03 AKB - do I need to pass this between the client and server? looks like it's just "io"
   merge debug=JSON("debug")
   merge io=JSON("io")
+  merge inst=JSON("inst")
   do GDEINIT^GDEINIT
   do GDEMSGIN^GDEMSGIN
   i $$ALL^GDEVERIF,$$GDEPUT^GDEPUT do  
+  . s ^ashokvar="inside" ;DEBUG remove
   . s verifySaveStatus="success"
   . ;
   . ; new $etrap
@@ -78,6 +81,7 @@ handle(ARGS,BODY,RESULT)
   . . set next=$order(getMapData("segs",x))
   . . if x'=$$FUNC^%UCASE(x) kill getMapData("segs",x)
   e  s verifySaveStatus="failure",getMapData="" ;null value instead of empty string for getMapData?
+  set ^ashokvar=$ZSTATUS ;DEBUG remove
   set RSLT("verifySaveStatus")=verifySaveStatus
   merge RSLT("getMapData")=getMapData
   do ENCODE^VPRJSON("RSLT","RESULT","ERR")
