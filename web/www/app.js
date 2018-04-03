@@ -614,7 +614,7 @@ window.onload = function() {
     const segmentsArray = Object.keys(segs);
     //TODO: make sure that region/segment parameter names indeed show up on the JS side in uppercase
     //is the filter undefined operation here redundant? (i.e. if undefined segment-file associations are being treated as an error and handled elsewhere, like in the edge-drawing code in this function)
-    const filesArray = Array.from(new Set(segmentsArray.map(seg => segs[seg].FILE_NAME))).filter(file => file != undefined) //Array.from(new Set(Object.values(segFileMap)));
+    const filesArray = Array.from(new Set(segmentsArray.map(seg => segs[seg].FILE_NAME))).filter(file => file != undefined && file !== "") //Array.from(new Set(Object.values(segFileMap)));
     view.xScalingFactor = Math.max(1, namesArray.length / 3)
     view.yScalingFactor = Math.max(1, namesArray.length / regionsArray.length);
     const nameIds = {}; //cannot use name/region/etc. strings as sigma element ids due to possible duplicates
@@ -698,12 +698,14 @@ window.onload = function() {
       //error/exception handling if for some region a segment is missing an associated file (There won't be a nonexistent file here since the file list is obtained by grabbing all segment FILE_NAME values)
       let file = segs[seg].FILE_NAME;
       if (file === undefined) throw "Missing file for segment " + seg;
-      let fileId = fileIds[file];
-      sig.graph.addEdge({
-        id: segmentId + '-' + fileId,
-        source: segmentId,
-        target: fileId,
-      });
+      if (file !== "") {
+        let fileId = fileIds[file];
+        sig.graph.addEdge({
+          id: segmentId + '-' + fileId,
+          source: segmentId,
+          target: fileId,
+        });
+      }
     });
     sig.refresh();
   }
@@ -894,5 +896,7 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //it's possible to hit Esc to dismiss the blocker dialog - can and should this be disabled?
 //TODO convert added regions/segments to uppercase in the client side add node function, or display an error if user attempts to enter any lowercase text
 //TODO implement behavior for saving an incorrect state (specific verification error)
+//TODO empty string file node appears when saving a valid(?) directory state where a segment does not have a file - early quit from change link function? when attempting to change that link to empty string via the dialog, the change link dialog closes but not the info dialog
+//-should saving a segment without a file/with an empty string file name be prevented?
 //
 //maybe GDE issue? - can submit a variable set that passes verification but not saving (e.g. lowercase regions/segments)
