@@ -44,6 +44,7 @@ window.onload = function() {
 
   $("#blocker").dialog({
     dialogClass: "no-close",
+    closeOnEscape: false,
   });
 
 
@@ -893,7 +894,6 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //
 //GETOUT^GDEEXIT when connection closes?
 //
-//it's possible to hit Esc to dismiss the blocker dialog - can and should this be disabled?
 //TODO convert added regions/segments to uppercase in the client side add node function, or display an error if user attempts to enter any lowercase text
 //TODO implement behavior for saving an incorrect state (specific verification error)
 //TODO empty string file node appears when saving a valid(?) directory state where a segment does not have a file - early quit from change link function? when attempting to change that link to empty string via the dialog, the change link dialog closes but not the info dialog
