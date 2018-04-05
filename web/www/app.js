@@ -200,8 +200,17 @@ window.onload = function() {
     sig.graph.dropNode(nodeToDeleteId);
     nodesOfType = sig.graph.nodes().filter(node => node.id.substring(0, 1) === nodeIdPrefix);
     for (let i = 0; i < nodesOfType.length; ++i) {
-      nodesOfType[i].y = ((nodeIdPrefix === 'n') ? i : i * view.yScalingFactor);
+      nodesOfType[i].target_y = ((nodeIdPrefix === 'n') ? i : i * view.yScalingFactor);
     }
+    sigma.plugins.animate(
+      sig,
+      {
+        y: 'target_y',
+      },
+      {
+        nodes: nodesOfType.map(node => node.id),
+      }
+    );
     /*sig.graph.addNode({
       id: "r"+len, //will result in non-unique id error if deleting nodes doesn't adjust remaining ids such that the number portion is never >= the number of nodes - update - changing node IDs without changing edge IDs is a bad idea with current design
       label: newRegion,
@@ -885,12 +894,13 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //DataBallet uses globals for scratch space - this can't happen in production
 //simply convert DataBallet globals to locals? -changed TMP, CACHE, and SESSION (there might be more) - stopping DataBallet was abnormal - UI displayed map for original GLD, failed to display when switching to acct.gld - need to figure out why
 
-//TODO clean stop, accept only one connection, template modification (JS side), save/verify, changes to GDE - where do they get saved? (-work locally now, merge into YottaDB repo later), load and test more glds
+//TODO clean stop, accept only one connection (still applicable now that we know keepalive is impossible?), template modification (JS side), save/verify, changes to GDE - where do they get saved? (-work locally now, merge into YottaDB repo later), load and test more glds
 //TODO better handling of large numbers of graph nodes
 //TODO better graph organization - what algorithm? minimize total line distance? minimize sum of squares of line distances? group by names by region? re-render button for simplifying graph after adding or deleting nodes and/or re-render on add/delete?
 //-region/segment/file spacing scaling factor? on draw/add/delete events for non-name nodes
 //-also an x-scaling factor
 //-animation?
+//Option for dealing with debugging code that writes to globals - provide an extended reference i.e. pass in a separate directory and use that for debugging
 //
 //GETOUT^GDEEXIT when connection closes?
 //
@@ -898,5 +908,9 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //TODO implement behavior for saving an incorrect state (specific verification error)
 //TODO empty string file node appears when saving a valid(?) directory state where a segment does not have a file - early quit from change link function? when attempting to change that link to empty string via the dialog, the change link dialog closes but not the info dialog
 //-should saving a segment without a file/with an empty string file name be prevented?
+//TODO remove cdnjs script download dependencies
+//TODO animations, more intelligent spacing (i.e. keeping connected regions and segments in line horizontally) 
+//
+//possible upgrade: Fable (F#) or ReasonML+BuckleScript (OCaml) conversion - might help with type safety and establishing invariant relationships
 //
 //maybe GDE issue? - can submit a variable set that passes verification but not saving (e.g. lowercase regions/segments)
