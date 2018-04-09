@@ -7,6 +7,11 @@ Instructions for launching the GDE GUI:
 3. Copy the web/ folder from this repository into $gtmdir.
 4. In YottaDB direct mode, set ^%WHOME to the full path of where you copied the web/ directory, ending with web/www/. 
 5. From direct mode, run DO WEB^GDE(portnum) - portnum can be 8080.
-6. In the browser, connect to localhost:8080 to load the GUI.
+  * If the routines are being compiled, compilation errors from code intended for other MUMPS implementations is expected.
+  * Click on the dot next to a node to bring up a menu for that item.
+  * Saving re-orders the graph.
+6. In the browser, connect to localhost:8080 to load the GUI. Use the mouse scrolling function to zoom in and out.
 7. To shut down the server, kill the mumps server process; currently, this is the only way to stop the server.
 8. To restart the server, run DO WEB^GDE(portnum) from direct mode.
+
+Note that this is just a proof-of-concept prototype, and not intended for use other than to evaluate user-interface models.
