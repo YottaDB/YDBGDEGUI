@@ -10,7 +10,7 @@ GO ; start up REST listener with defaults
  QUIT
  ;
 JOB(PORT,TLSCONFIG,NOGBL) ; Convenience entry point
- I +$SY=47 J START^VPRJREQ(PORT,,$G(TLSCONFIG),$G(NOGBL)):(IN="/dev/null":OUT="/dev/null":ERR="/dev/null"):5 S KBBO("JOBS",$ZJOB)="" ; no in and out files please.
+ I +$SY=47 J START^VPRJREQ(PORT,,$G(TLSCONFIG),$G(NOGBL)):(IN="/dev/null":OUT="vprjreq.mjo":ERR="vprjreq.mje"):5 S KBBO("JOBS",$ZJOB)="" ; no in and out files please.
  E  J START^VPRJREQ(PORT,"",$G(TLSCONFIG),$G(NOGBL)) ; Cache can't accept an empty string in the second argument
  QUIT
  ;
