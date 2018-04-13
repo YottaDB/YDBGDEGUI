@@ -332,7 +332,7 @@ window.onload = function() {
             id: targetNodeId,
             label: linkTargetLabel,
             x: 4 * view.xScalingFactor, //should centralize this (the "magic number" numerical portion i.e. 4), along with size and color
-            y: fileNodes.length - 1 + view.yScalingFactor,
+            y: (fileNodes.length + 1) * view.yScalingFactor,
             size: 1,
             color: '#000',
           });
