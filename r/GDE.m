@@ -28,7 +28,7 @@ DBG:	;transfer point for DEBUG and "runtime" %gde
 	; Prepare special $etrap to issue error in case VIEW "YLCT" call to set local collation fails below
 	; Need to use this instead of the gde $etrap (set a few lines later below) as that expects some initialization
 	; to have happened whereas we are not yet there since setting local collation is a prerequisite for that init.
-	s $et="w !,$p($zs,"","",3,999) s $ecode="""" zm 150503603:$zparse(""$gtmgbldir"","""",""*.gld"") quit"
+	s $et="w !,$p($zs,"","",3,999) s $ecode="""" zm 150503603:$zparse(""$ydb_gbldir"","""",""*.gld"") quit"
 	;v "YLCT":0:1:0		; sets local variable alternate collation = 0, null collation = 1, numeric collation = 0
 	; since GDE creates null subscripts, we don't want user level setting of gtm_lvnullsubs to affect us in any way
 	s gdeEntryState("nullsubs")=$v("LVNULLSUBS")

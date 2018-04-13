@@ -11,8 +11,6 @@
 save ;;save the new GDE local state obtained from the client
 handle(ARGS,BODY,RESULT)
   ;
-  kill ^ashokvar ;DEBUG remove
-  ;s ^ashokvar="entry" ;DEBUG remove
   new JSON,RSLT,ERR
   do DECODE^VPRJSON("BODY","JSON","ERR")
   new verifySaveStatus
@@ -52,8 +50,18 @@ handle(ARGS,BODY,RESULT)
   merge inst=JSON("inst")
   do GDEINIT^GDEINIT
   do GDEMSGIN^GDEMSGIN
+  ;do NAME^GDEADD,REGION^GDEADD,SEGMENT^GDEADD ;phasing this out in favor of add2nams^gdemap()
+  ;
+  ;loop over the bindings in nams and call add2nams^GDEMAP() for each range-type name in order to properly structure the nams data tree to handle subscripted ranges
+  ;nams(x) needs to be killed before add2nams() is called, since add2nams() quits if there is data there
+  set next=$order(nams("")) for  set x=next quit:x=""  do
+  . set next=$order(nams(x))
+  . if x?1.A1"("1.N1":"1.N1")" do  ;IMPORTANT TODO: is this true iff x is a range-typed name? what happens when the left side number is == or > the right? are these checks handled elsewhere in the GDE code? gdeparse.m? currently A>B range subscripts break the gld
+  . . new reg set reg=nams(x)
+  . . kill nams(x)
+  . . new namPlusCaret set namPlusCaret="^"_x ;add2nams^GDEMAP() expects a leading caret and removes the first character in accordance with that assuption
+  . . do add2nams^GDEMAP(namPlusCaret,reg,"RANGE")
   i $$ALL^GDEVERIF,$$GDEPUT^GDEPUT do  
-  . s ^ashokvar="inside" ;DEBUG remove
   . s verifySaveStatus="success"
   . ;
   . ; new $etrap
@@ -81,7 +89,6 @@ handle(ARGS,BODY,RESULT)
   . . set next=$order(getMapData("segs",x))
   . . if x'=$$FUNC^%UCASE(x) kill getMapData("segs",x)
   e  s verifySaveStatus="failure",getMapData="" ;null value instead of empty string for getMapData?
-  set ^ashokvar=$ZSTATUS ;DEBUG remove
   set RSLT("verifySaveStatus")=verifySaveStatus
   merge RSLT("getMapData")=getMapData
   do ENCODE^VPRJSON("RSLT","RESULT","ERR")

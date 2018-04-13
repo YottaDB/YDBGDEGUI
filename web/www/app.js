@@ -914,3 +914,7 @@ click node for info prompt, with "delete" button inside, and also "connect to re
 //possible upgrade: Fable (F#) or ReasonML+BuckleScript (OCaml) conversion - might help with type safety and establishing invariant relationships
 //
 //maybe GDE issue? - can submit a variable set that passes verification but not saving (e.g. lowercase regions/segments)
+//
+//TODO file node spacing bug, invalid range problem (and other missing checks)
+//
+//for informing users of global vars used by the server - either document the variables that get overwritten (is ^DD from _WHOME.m one of them?), or create a second gld parameter that can be passed in for the server operation globals
