@@ -273,7 +273,8 @@ RPCO(RESULT,ARGS) ; Get Remote Procedure Information; handles OPTIONS rpc/{rpc}
  QUIT
  ;
 FILESYS(RESULT,ARGS) ; Handle filesystem/*
- I '$D(ARGS)&$D(PATHSEG) S ARGS("*")=PATHSEG
+ I '$D(ARGS)&$D(HTTPREQ("path")) S ARGS("*")=$e(HTTPREQ("path"),2,$l(HTTPREQ("path")))
+ I $G(ARGS("*"))="" S ARGS("*")=HTTPREQ("path")
  N PATH
  ;
  ; Vhere is our home? If any home!

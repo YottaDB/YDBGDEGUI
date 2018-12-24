@@ -10,6 +10,7 @@ RESPOND ; find entry point to handle request and call it
  K:'$G(NOGBL) ^TMP($J)
  N ROUTINE,LOCATION,HTTPARGS,HTTPBODY
  I HTTPREQ("path")="/",HTTPREQ("method")="GET" D EN^%WHOME(.HTTPRSP) QUIT  ; Home page requested.
+ I HTTPREQ("method")="OPTIONS" S HTTPRSP="OPTIONS,POST" QUIT ; Always repond to OPTIONS to give CORS header info
  D MATCH(.ROUTINE,.HTTPARGS) I $G(HTTPERR) QUIT  ; Resolve the URL and authenticate if necessary
  D QSPLIT(.HTTPARGS) I $G(HTTPERR) QUIT          ; Split the query string
  S HTTPREQ("paging")=$G(HTTPARGS("start"),0)_":"_$G(HTTPARGS("limit"),999999)
@@ -186,6 +187,11 @@ SENDATA ; write out the data as an HTTP response
  . D W("Content-Type: "_HTTPRSP("mime")_$C(13,10)) K HTTPRSP("mime") ; Mime-type
  E  D W("Content-Type: application/json; charset=utf-8"_$C(13,10))
  ;
+ ; Add CORS Header
+ I $G(HTTPREQ("method"))="OPTIONS" D W("Access-Control-Allow-Methods: OPTIONS, POST"_$C(13,10))
+ I $G(HTTPREQ("method"))="OPTIONS" D W("Access-Control-Allow-Headers: Content-Type"_$C(13,10))
+ I $G(HTTPREQ("method"))="OPTIONS" D W("Access-Control-Max-Age: 86400"_$C(13,10))
+ D W("Access-Control-Allow-Origin: *"_$C(13,10))
  I +$SY=47,$G(HTTPREQ("header","accept-encoding"))["gzip" D GZIP QUIT  ; If on GT.M, and we can zip, let's do that!
  ;
  D W("Content-Length: "_SIZE_$C(13,10)_$C(13,10))
@@ -352,52 +358,19 @@ XML(RESULT,ARGS) ; text XML
 VPRMATCH(ROUTINE,ARGS) ; specific algorithm for matching URL's
  Q
 URLMAP ; map URLs to entry points (HTTP methods handled within entry point)
- ;;GET app.js FILESYS^%W0
- ;;GET getmap handle^getmap
- ;;POST verify handle^verify
- ;;POST save handle^save
- ;;POST vpr/{pid?1.N} PUTOBJ^VPRJPR
- ;;PUT vpr/{pid?1.N} PUTOBJ^VPRJPR
- ;;GET vpr/{pid?1.N}/index/{indexName} INDEX^VPRJPR
- ;;GET vpr/{pid?1.N}/index/{indexName}/{template} INDEX^VPRJPR
- ;;GET vpr/{pid?1.N}/count/{countName} COUNT^VPRJPR
- ;;GET vpr/{pid?1.N}/last/{indexName} LAST^VPRJPR
- ;;GET vpr/{pid?1.N}/last/{indexName}/{template} LAST^VPRJPR
- ;;GET vpr/{pid?1.N}/{uid?1"urn:".E} GETOBJ^VPRJPR
- ;;GET vpr/{pid?1.N}/{uid?1"urn:".E}/{template} GETOBJ^VPRJPR
- ;;GET vpr/{pid?1.N}/find/{collection} FIND^VPRJPR
- ;;GET vpr/{pid?1.N}/find/{collection}/{template} FIND^VPRJPR
- ;;GET vpr/{pid?1.N} GETPT^VPRJPR
- ;;GET vpr/uid/{uid?1"urn:".E} GETUID^VPRJPR
- ;;GET vpr/uid/{uid?1"urn:".E}/{template} GETUID^VPRJPR
- ;;POST vpr PUTPT^VPRJPR
- ;;PUT vpr PUTPT^VPRJPR
- ;;GET vpr/all/count/{countName} ALLCOUNT^VPRJPR
- ;;GET vpr/all/index/{indexName} ALLINDEX^VPRJPR
- ;;GET vpr/all/index/{indexName}/{template} ALLINDEX^VPRJPR
- ;;GET vpr/all/find/{collection} ALLFIND^VPRJPR
- ;;GET vpr/all/find/{collection}/{template} ALLFIND^VPRJPR
- ;;GET vpr/pid/{icndfn} PID^VPRJPR
- ;;DELETE vpr/{pid?1.N}/{uid?1"urn:".E} DELUID^VPRJPR
- ;;DELETE vpr/uid/{uid?1"urn:".E} DELUID^VPRJPR
- ;;DELETE vpr/{pid?1.N} DELPT^VPRJPR
- ;;DELETE vpr DELALL^VPRJPR
- ;;DELETE vpr/{pid?1.N}/collection/{collectionName} DELCOLL^VPRJPR
- ;;DELETE vpr/all/collection/{collectionName} ALLDELC^VPRJPR
- ;;POST data PUTOBJ^VPRJDR
- ;;PUT data PUTOBJ^VPRJDR
- ;;PUT data/{collectionName} NEWOBJ^VPRJDR
- ;;POST data/{collectionName} NEWOBJ^VPRJDR
- ;;GET data/{uid?1"urn:".E} GETOBJ^VPRJDR
- ;;GET data/index/{indexName} INDEX^VPRJDR
- ;;GET data/last/{indexName} LAST^VPRJDR
- ;;GET data/count/{countName} COUNT^VPRJDR
- ;;GET data/find/{collection} FIND^VPRJDR
- ;;GET data/find/{collection}/{template} FIND^VPRJDR
- ;;DELETE data/{uid?1"urn:".E} DELUID^VPRJDR
- ;;DELETE data/collection/{collectionName} DELCTN^VPRJDR
- ;;DELETE data DELALL^VPRJDR
- ;;GET ping PING^VPRJRSP
+ ;;GET static/{.ANP1".css"} FILESYS^%W0
+ ;;GET static/css/{.ANP1".css"} FILESYS^%W0
+ ;;GET static/css/{.ANP1".css.map"} FILESYS^%W0
+ ;;GET static/fonts/{.ANP1".woff"} FILESYS^%W0
+ ;;GET static/fonts/{.ANP1".ttf"} FILESYS^%W0
+ ;;GET static/img/{.ANP1".png"} FILESYS^%W0
+ ;;GET static/js/{.ANP1".js"} FILESYS^%W0
+ ;;GET static/js/{.ANP1".js.map"} FILESYS^%W0
+ ;;GET get get^GDEWEB
+ ;;POST verify verify^GDEWEB
+ ;;POST save save^GDEWEB
+ ;;POST add add^GDEWEB
+ ;;POST delete delete^GDEWEB
  ;;zzzzz
  Q
  ;
