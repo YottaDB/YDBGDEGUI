@@ -54,8 +54,16 @@ RUN . $HOME/.nvm/nvm.sh && \
 
 # Compile M programs
 RUN . /opt/yottadb/gui/env && \
+    cd /opt/yottadb/gui/webserver/o && \
+    mumps ../*.m >/dev/null 2>&1 || true
+
+RUN . /opt/yottadb/gui/env && \
+    cd /opt/yottadb/gui/munit/o && \
+    mumps ../*.m >/dev/null 2>&1 || true
+
+RUN . /opt/yottadb/gui/env && \
     cd /opt/yottadb/gui/o && \
-    mumps ../r/*.m || true
+    mumps ../r/*.m
 
 EXPOSE 8080
 
