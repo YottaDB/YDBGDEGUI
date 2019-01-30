@@ -237,10 +237,9 @@
       ref="modalAdd"
       size="lg"
       @hide="resetModal"
-      @ok="ok"
+      @ok="ok(addType)"
       title="Add to Global Directory"
     >
-      <b-container fluid>
         <b-row>
           <b-col>
             <b-form-group horizontal label="Type:">
@@ -563,7 +562,10 @@
             </b-row>
           </b-input-group>
         </b-form-group>
-      </b-container>
+        <div slot="modal-footer" >
+          <b-btn size="sm" variant="primary" @click="ok(addType)">OK</b-btn>
+          <b-btn size="sm" variant="warning" @click="cancel()">Cancel</b-btn>
+      </div>
     </b-modal>
 
     <!-- Edit Name Modal -->
@@ -602,7 +604,7 @@
         </b-input-group>
       </b-form-group>
       <div slot="modal-footer" >
-         <b-btn size="sm" variant="primary" @click="ok()">OK</b-btn>
+         <b-btn size="sm" variant="primary" @click="ok('name')">OK</b-btn>
          <b-btn size="sm" variant="warning" @click="cancel()">Cancel</b-btn>
       </div>
     </b-modal>
@@ -735,7 +737,7 @@
         </b-input-group>
       </b-form-group>
       <div slot="modal-footer" >
-        <b-btn size="sm" variant="primary" @click="ok()">OK</b-btn>
+        <b-btn size="sm" variant="primary" @click="ok('segment')">OK</b-btn>
         <b-btn size="sm" variant="warning" @click="cancel()">Cancel</b-btn>
       </div>
     </b-modal>
@@ -912,7 +914,7 @@
         </b-input-group>
       </b-form-group>
       <div slot="modal-footer" >
-        <b-btn size="sm" variant="primary" @click="ok()">OK</b-btn>
+        <b-btn size="sm" variant="primary" @click="ok('region')">OK</b-btn>
         <b-btn size="sm" variant="warning" @click="cancel()">Cancel</b-btn>
       </div>
     </b-modal>
@@ -1064,6 +1066,7 @@ export default {
   computed: {
     sortOptions() {
       const self = this;
+
       // Create an options list from our fields
       return self.fields
         .filter(f => f.sortable)
@@ -1074,6 +1077,7 @@ export default {
     info(item) {
       const self = this;
       self.boundItem = item;
+
       // Make unbound clones of the item object
       self.cachedItem = Object.assign({}, item);
       self.selectedItem = {
@@ -1119,6 +1123,7 @@ export default {
     },
     okError() {
       const self = this;
+
       // Reset & Hide the modal - nothing to do here
       self.errors = null;
       self.resetModal();
@@ -1126,11 +1131,14 @@ export default {
     },
     cancel() {
       const self = this;
+
       // Reset the boundItem to the copy we made earlier and hide the modal
       // this.selectedItem = Object.assign(this.boundItem, this.cachedItem);
       self.errors = null;
       self.resetModal();
-      self.$refs.modalEdit.hide();
+
+      // hide all the modals
+      self.hideModals();
     },
     focusElement() {
       const self = this;
@@ -1138,6 +1146,7 @@ export default {
     },
     resetModal() {
       const self = this;
+
       // Clear out anything in selected item and set boundItem, CachedItem and selectedIndex to null
       // Only reset if errors isn't set
       if (self.errors === null) {
@@ -1188,6 +1197,7 @@ export default {
     },
     makeitems() {
       const self = this;
+
       // Builds a filled out items array combining information in regions, segments, and names
       const newItems = [];
       Object.keys(self.names).forEach((name) => {
@@ -1261,10 +1271,12 @@ export default {
       });
       self.segmentItems = Object.assign([], newSegments);
     },
-    ok() {
+    ok(type) {
       const self = this;
       self.saved = false;
-      switch (self.addType) {
+
+      // Move data from the modal to the correct object behind the scenes
+      switch (type) {
         case 'name':
           this.names[self.selectedItem.name.NAME] = self.selectedItem.name.REGION;
           break;
@@ -1277,8 +1289,21 @@ export default {
         default:
           break;
       }
+
+      // Verify the data, but don't save it
       self.verifydata();
-      self.$refs.modalEdit.hide();
+
+      // hide all the modals
+      self.hideModals();
+    },
+    hideModals() {
+      const self = this;
+
+      // Put all modals here to be hidden when OK or Cancel is pressed
+      self.$refs.modalAdd.hide();
+      self.$refs.modalEditName.hide();
+      self.$refs.modalEditRegion.hide();
+      self.$refs.modalEditSegment.hide();
     },
     remove(item, type) {
       const self = this;
