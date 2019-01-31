@@ -268,6 +268,19 @@ verify	;; @TEST Verify web service
 	d ASSERT("%GDE-I-MAPBAD, A NAME for REGION YOTTADB does not exist",$g(JSON("errors",1)),"Receved an unexpected error from lowercase Segment, lowercase Region")
 	d ASSERT(0,$d(JSON("errors",2)),"Receved too many errors from Invalid Name, Invalid Segment, Invalid Region")
 	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from lowercase Segment, lowercase Region")
+	;
+	; no file name for segment
+	k BODY,RESULT,HTTPERR,^TMP("HTTPERR",$J),JSON
+	; yes, this is a really long line
+	s BODY="{""names"":{""#"":""DEFAULT"",""*"":""DEFAULT"",""XTMP"":""TEMP""},""regions"":{""DEFAULT"":{""ALIGNSIZE"":4096,""ALLOCATION"":2048,""AUTODB"":0,""AUTOSWITCHLIMIT"":8386560,""BEFORE_IMAGE"":1,""BUFFER_SIZE"":2312,""COLLATION_DEFAULT"":0,""DYNAMIC_SEGMENT"":""DEFAULT"",""EPOCHTAPER"":1,""EPOCH_INTERVAL"":300,""EXTENSION"":2048,""FILE_NAME"":""/opt/yottadb/gui/j/vehu.mjl"",""INST_FREEZE_ON_ERROR"":0,""JOURNAL"":1,""KEY_SIZE"":1019,""LOCK_CRIT_SEPARATE"":1,""NULL_SUBSCRIPTS"":0,""QDBRUNDOWN"":0,""RECORD_SIZE"":16368,""STATS"":1,""STDNULLCOLL"":1,""SYNC_IO"":0,""YIELD_LIMIT"":8},""TEMP"":{""ALIGNSIZE"":4096,""ALLOCATION"":2048,""AUTODB"":0,""AUTOSWITCHLIMIT"":8386560,""BEFORE_IMAGE"":0,""BUFFER_SIZE"":2312,""COLLATION_DEFAULT"":0,""DYNAMIC_SEGMENT"":""TEMP"",""EPOCHTAPER"":1,""EPOCH_INTERVAL"":300,""EXTENSION"":2048,""FILE_NAME"":"""",""INST_FREEZE_ON_ERROR"":0,""JOURNAL"":0,""KEY_SIZE"":1019,""LOCK_CRIT_SEPARATE"":1,""NULL_SUBSCRIPTS"":0,""QDBRUNDOWN"":0,""RECORD_SIZE"":16368,""STATS"":1,""STDNULLCOLL"":1,""SYNC_IO"":0,""YIELD_LIMIT"":8}},""segments"":{""DEFAULT"":{""ACCESS_METHOD"":""BG"",""ALLOCATION"":200000,""ASYNCIO"":0,""BLOCK_SIZE"":4096,""BUCKET_SIZE"":"""",""DEFER"":"""",""DEFER_ALLOCATE"":1,""ENCRYPTION_FLAG"":0,""EXTENSION_COUNT"":1024,""FILE_NAME"":""/opt/yottadb/gui/g/vehu.dat"",""FILE_TYPE"":""DYNAMIC"",""GLOBAL_BUFFER_COUNT"":4096,""LOCK_SPACE"":400,""MUTEX_SLOTS"":1024,""RESERVED_BYTES"":0,""WINDOW_SIZE"":""""},""TEMP"":{""ACCESS_METHOD"":""MM"",""ALLOCATION"":10000,""ASYNCIO"":0,""BLOCK_SIZE"":4096,""BUCKET_SIZE"":"""",""DEFER"":1,""DEFER_ALLOCATE"":1,""ENCRYPTION_FLAG"":0,""EXTENSION_COUNT"":1024,""FILE_NAME"":""/opt/yottadb/gui/g/temp.dat"",""FILE_TYPE"":""DYNAMIC"",""GLOBAL_BUFFER_COUNT"":4096,""LOCK_SPACE"":400,""MUTEX_SLOTS"":1024,""RESERVED_BYTES"":0,""WINDOW_SIZE"":""""},""ASDF"":{""NAME"":""ASDF"",""FILE_NAME"":"""",""ACCESS_METHOD"":""BG"",""ALLOCATION"":100,""ASYNCIO"":false,""BLOCK_SIZE"":1024,""DEFER_ALLOCATE"":true,""ENCRYPTION_FLAG"":false,""EXTENSION_COUNT"":100,""GLOBAL_BUFFER_COUNT"":1024,""LOCK_SPACE"":40,""MUTEX_SLOTS"":1024,""RESERVED_BYTES"":0}}}"
+	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
+	d ASSERT(11,$d(RESULT),"Incorrect Response from no file name for segment")
+	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d ASSERT(0,$d(ERR),"Unable to decode JSON from no file name for segment")
+	d ASSERT("",$g(HTTPERR),"Incorrect Response from no file name for segment")
+	d ASSERT("%GDE-E-QUALREQD, File required",$g(JSON("errors",1)),"Receved an unexpected error from no file name for segment")
+	d ASSERT(0,$d(JSON("errors",2)),"Receved too many errors from no file name for segment")
+	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from no file name for segment")
 	QUIT
 	;
 save	;; @TEST save web service

@@ -416,11 +416,12 @@ verify(ARGS,BODY,RESULT)
 	. ; End from GDEPARSE
 	. ; From GDEADD
 	. i '$d(JSON("segments",SEGMENT,"FILE_NAME")) d message^GDE(gdeerr("QUALREQD"),"""File""") q
+	. i $g(JSON("segments",SEGMENT,"FILE_NAME"))="" d message^GDE(gdeerr("QUALREQD"),"""File""") q
 	. ; End from GDEADD
 	. i ($l($g(JSON("segments",SEGMENT,"ACCESS_METHOD")))) m segs(SEGMENT)=tmpseg(JSON("segments",SEGMENT,"ACCESS_METHOD"))
 	. ; remove a GUI artifact TODO: fix the gui
 	. k JSON("segments",SEGMENT,"NAME")
-	. k JSON("segments",x,"DEFER")
+	. k JSON("segments",SEGMENT,"DEFER")
 	. s attr="" f  s attr=$o(JSON("segments",SEGMENT,attr)) q:attr=""  d
 	. . i '$l($g(JSON("segments",SEGMENT,attr))) k JSON("segments",SEGMENT,attr)
 	. ; Now merge the incoming segment
