@@ -256,6 +256,18 @@ verify	;; @TEST Verify web service
 	d ASSERT("%GDE-E-PREFIXBAD, -YOTTADB - segment name must start with an alphabetic character",$g(JSON("errors",3)),"Receved an unexpected error from Invalid Name, Invalid Segment, Invalid Region")
 	d ASSERT(0,$d(JSON("errors",4)),"Receved too many errors from Invalid Name, Invalid Segment, Invalid Region")
 	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from Invalid Name, Invalid Segment, Invalid Region")
+	;
+	; lowercase Segment, lowercase Region
+	k BODY,RESULT,HTTPERR,^TMP("HTTPERR",$J),JSON
+	s BODY="{""regions"":{""yottadb"":{""DYNAMIC_SEGMENT"":""yottadb""}},""segments"":{""yottadb"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
+	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
+	d ASSERT(11,$d(RESULT),"Incorrect Response from lowercase Segment, lowercase Region")
+	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d ASSERT(0,$d(ERR),"Unable to decode JSON from lowercase Segment, lowercase Region")
+	d ASSERT("",$g(HTTPERR),"Incorrect Response from lowercase Segment, lowercase Region")
+	d ASSERT("%GDE-I-MAPBAD, A NAME for REGION YOTTADB does not exist",$g(JSON("errors",1)),"Receved an unexpected error from lowercase Segment, lowercase Region")
+	d ASSERT(0,$d(JSON("errors",2)),"Receved too many errors from Invalid Name, Invalid Segment, Invalid Region")
+	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from lowercase Segment, lowercase Region")
 	QUIT
 	;
 save	;; @TEST save web service

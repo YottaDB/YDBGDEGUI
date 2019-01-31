@@ -198,10 +198,10 @@ deleteone(JSON)
 	. s NAME=$g(JSON("name","NAME"))
 	. d NAME^GDEDELET
 	i $d(JSON("region")) d
-	. s REGION=$g(JSON("region","REGION"))
+	. s REGION=$tr($g(JSON("region","REGION")),lower,upper)
 	. d REGION^GDEDELET
 	i $d(JSON("segment")) d
-	. s SEGMENT=$g(JSON("segment","SEGMENT"))
+	. s SEGMENT=$tr($g(JSON("segment","SEGMENT")),lower,upper)
 	. d SEGMENT^GDEDELET
 	quit
 ;
@@ -268,7 +268,9 @@ save(ARGS,BODY,RESULT)
 	. s attr="" f  s attr=$o(JSON("regions",x,attr)) q:attr=""  d
 	. . i '$l($g(JSON("regions",x,attr))) k JSON("regions",x,attr)
 	. ; Now merge the the incoming region
-	. m regs(x)=JSON("regions",x)
+	. m regs($tr(x,lower,upper))=JSON("regions",x)
+	. ; uppercase the dynamic segment
+	. s regs($tr(x,lower,upper),"DYNAMIC_SEGMENT")=$tr(regs($tr(x,lower,upper),"DYNAMIC_SEGMENT"),lower,upper)
 	;
 	; Segments:
 	s x="" f  s x=$o(JSON("segments",x)) q:x=""  d
@@ -279,7 +281,7 @@ save(ARGS,BODY,RESULT)
 	. s attr="" f  s attr=$o(JSON("segments",x,attr)) q:attr=""  d
 	. . i '$l($g(JSON("segments",x,attr))) k JSON("segments",x,attr)
 	. ; Now merge the incoming segment
-	. m segs(x)=JSON("segments",x)
+	. m segs($tr(x,lower,upper))=JSON("segments",x)
 	;
 	; Template Access Methods:
 	m tmpacc=JSON("template","accessMethod")
@@ -391,7 +393,9 @@ verify(ARGS,BODY,RESULT)
 	. s attr="" f  s attr=$o(JSON("regions",REGION,attr)) q:attr=""  d
 	. . i '$l($g(JSON("regions",REGION,attr))) k JSON("regions",REGION,attr)
 	. ; Now merge the the incoming region
-	. m regs(REGION)=JSON("regions",REGION)
+	. m regs($tr(REGION,lower,upper))=JSON("regions",REGION)
+	. ; uppercase the dynamic segment
+	. s regs($tr(REGION,lower,upper),"DYNAMIC_SEGMENT")=$tr(regs($tr(REGION,lower,upper),"DYNAMIC_SEGMENT"),lower,upper)
 	;
 	; Segments:
 	s SEGMENT="" f  s SEGMENT=$o(JSON("segments",SEGMENT)) q:SEGMENT=""  d
@@ -420,7 +424,7 @@ verify(ARGS,BODY,RESULT)
 	. s attr="" f  s attr=$o(JSON("segments",SEGMENT,attr)) q:attr=""  d
 	. . i '$l($g(JSON("segments",SEGMENT,attr))) k JSON("segments",SEGMENT,attr)
 	. ; Now merge the incoming segment
-	. m segs(SEGMENT)=JSON("segments",SEGMENT)
+	. m segs($tr(SEGMENT,lower,upper))=JSON("segments",SEGMENT)
 	;
 	; Template Access Methods:
 	m tmpacc=JSON("template","accessMethod")

@@ -289,7 +289,9 @@
               <b-col>
                 <b-input id="segment"
                               v-model="selectedItem.segment.NAME"
-                              :value="selectedItem.segment.NAME"/>
+                              :value="selectedItem.segment.NAME"
+                              @input="forceUpper($event, selectedItem.segment, 'NAME')"
+                              style="text-transform: uppercase;"/>
               </b-col>
               <!-- Row Break -->
               <div class="w-100"></div>
@@ -408,7 +410,9 @@
               <b-col>
                 <b-input id="region"
                               v-model="selectedItem.region.NAME"
-                              :value="selectedItem.region.NAME"/>
+                              :value="selectedItem.region.NAME"
+                              @input="forceUpper($event, selectedItem.region, 'NAME')"
+                              style="text-transform: uppercase;"/>
               </b-col>
               <!-- Row Break -->
               <div class="w-100"></div>
@@ -1074,6 +1078,9 @@ export default {
     },
   },
   methods: {
+    forceUpper(e, obj, prop) {
+      this.$set(obj, prop, e.toUpperCase());
+    },
     info(item) {
       const self = this;
       self.boundItem = item;
