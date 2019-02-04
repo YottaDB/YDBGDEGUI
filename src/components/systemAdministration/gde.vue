@@ -253,321 +253,359 @@
             </b-form-group>
           </b-col>
         </b-row>
-        <b-form-group>
+        <b-form>
+          <b-form-group>
 
-          <!-- Add name -->
-          <b-input-group v-if="addType==='name'">
-            <b-row>
-              <b-col>
-                <label for="name">Name:</label>
-              </b-col>
-              <b-col>
-                <b-input id="name"
-                              v-model="selectedItem.name.NAME"
-                              :value="selectedItem.name.NAME"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="region">Region:</label>
-              </b-col>
-              <b-col>
-                <b-select id="region"
-                          :options="regions"
-                          v-model="selectedItem.name.REGION"
-                          :value="selectedItem.name.REGION"/>
-              </b-col>
-            </b-row>
-          </b-input-group>
+            <!-- Add name -->
+            <b-input-group v-if="addType==='name'">
+              <b-row>
+                <b-col>
+                  <label for="name">Name:</label>
+                </b-col>
+                <b-col>
+                  <b-input id="name"
+                                v-model="selectedItem.name.NAME"
+                                :value="selectedItem.name.NAME"
+                                :state="!$v.selectedItem.name.NAME.$invalid"
+                                aria-describedby="nameLiveFeedback"/>
+                  <b-form-invalid-feedback id="nameLiveFeedback">
+                    This is a required field
+                  </b-form-invalid-feedback>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="region">Region:</label>
+                </b-col>
+                <b-col>
+                  <b-select id="region"
+                            :options="regions"
+                            v-model="selectedItem.name.REGION"
+                            :value="selectedItem.name.REGION"
+                            :state="!$v.selectedItem.name.REGION.$invalid"
+                            aria-describedby="regionLiveFeedback"/>
+                  <b-form-invalid-feedback id="regionLiveFeedback">
+                    This is a required field
+                  </b-form-invalid-feedback>
+                </b-col>
+              </b-row>
+            </b-input-group>
 
-          <!-- Add Segment -->
-          <b-input-group v-if="addType==='segment'">
-            <b-row>
-              <b-col>
-                <label for="segment">Segment:</label>
-              </b-col>
-              <b-col>
-                <b-input id="segment"
-                              v-model="selectedItem.segment.NAME"
-                              :value="selectedItem.segment.NAME"
-                              @input="forceUpper($event, selectedItem.segment, 'NAME')"
-                              style="text-transform: uppercase;"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="file">File:</label>
-              </b-col>
-              <b-col>
-                <b-input id="file"
-                              v-model="selectedItem.segment.FILE_NAME"
-                              :value="selectedItem.segment.FILE_NAME"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="accessMethod">Access Method:</label>
-              </b-col>
-              <b-col>
-                <b-select id="accessMethod"
-                              :options="accessMethods"
-                              v-model="selectedItem.segment.ACCESS_METHOD"
-                              :value="selectedItem.segment.ACCESS_METHOD"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="allocation">Allocation (blocks):</label>
-              </b-col>
-              <b-col>
-                <b-input id="allocation" v-model="selectedItem.segment.ALLOCATION"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="asyncio">Async IO:</label>
-              </b-col>
-              <b-col>
-                <b-check id="asyncio" v-model="selectedItem.segment.ASYNCIO"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="blockSize">
-                  Block Size (bytes & multiple of 512):
-                </label>
-              </b-col>
-              <b-col>
-                <b-input id="blockSize" v-model="selectedItem.segment.BLOCK_SIZE"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="deferAllocate">Defer Allocate:</label>
-              </b-col>
-              <b-col>
-                <b-check id="deferAllocate" v-model="selectedItem.segment.DEFER_ALLOCATE"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="encryption">Encryption:</label>
-              </b-col>
-              <b-col>
-                <b-check id="encryption" v-model="selectedItem.segment.ENCRYPTION_FLAG"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="extensionCount">Extension Count:</label>
-              </b-col>
-              <b-col>
-                <b-input id="extensionCount" v-model="selectedItem.segment.EXTENSION_COUNT"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="globalBufferCount">
-                  Global Buffer Count (blocks):
-                </label>
-              </b-col>
-              <b-col>
-                <b-input id="globalBufferCount" v-model="selectedItem.segment.GLOBAL_BUFFER_COUNT"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="lockSpace">Lock Space (pages):</label>
-              </b-col>
-              <b-col>
-                <b-input id="lockSpace" v-model="selectedItem.segment.LOCK_SPACE"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="mutexSlots">Mutex Slots:</label>
-              </b-col>
-              <b-col>
-                <b-input id="mutexSlots" v-model="selectedItem.segment.MUTEX_SLOTS"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="reservedBytes">Reserved Bytes:</label>
-              </b-col>
-              <b-col>
-                <b-input id="reservedBytes" v-model="selectedItem.segment.RESERVED_BYTES"/>
-              </b-col>
-            </b-row>
-          </b-input-group>
+            <!-- Add Segment -->
+            <b-input-group v-if="addType==='segment'">
+              <b-row>
+                <b-col>
+                  <label for="segment">Segment:</label>
+                </b-col>
+                <b-col>
+                  <b-input id="segment"
+                                v-model="selectedItem.segment.NAME"
+                                :value="selectedItem.segment.NAME"
+                                @input="forceUpper($event, selectedItem.segment, 'NAME')"
+                                style="text-transform: uppercase;"
+                                :state="!$v.selectedItem.segment.NAME.$invalid"
+                                aria-describedby="nameLiveFeedback"/>
+                  <b-form-invalid-feedback id="nameLiveFeedback">
+                    This is a required field
+                  </b-form-invalid-feedback>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="file">File:</label>
+                </b-col>
+                <b-col>
+                  <b-input id="file"
+                                v-model="selectedItem.segment.FILE_NAME"
+                                :value="selectedItem.segment.FILE_NAME"
+                                :state="!$v.selectedItem.segment.FILE_NAME.$invalid"
+                                aria-describedby="fileNameLiveFeedback"/>
+                  <b-form-invalid-feedback id="fileNameLiveFeedback">
+                    This is a required field
+                  </b-form-invalid-feedback>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="accessMethod">Access Method:</label>
+                </b-col>
+                <b-col>
+                  <b-select id="accessMethod"
+                                :options="accessMethods"
+                                v-model="selectedItem.segment.ACCESS_METHOD"
+                                :value="selectedItem.segment.ACCESS_METHOD"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="allocation">Allocation (blocks):</label>
+                </b-col>
+                <b-col>
+                  <b-input id="allocation" v-model="selectedItem.segment.ALLOCATION"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="asyncio">Async IO:</label>
+                </b-col>
+                <b-col>
+                  <b-check id="asyncio" v-model="selectedItem.segment.ASYNCIO"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="blockSize">
+                    Block Size (bytes & multiple of 512):
+                  </label>
+                </b-col>
+                <b-col>
+                  <b-input id="blockSize" v-model="selectedItem.segment.BLOCK_SIZE"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="deferAllocate">Defer Allocate:</label>
+                </b-col>
+                <b-col>
+                  <b-check id="deferAllocate" v-model="selectedItem.segment.DEFER_ALLOCATE"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="encryption">Encryption:</label>
+                </b-col>
+                <b-col>
+                  <b-check id="encryption" v-model="selectedItem.segment.ENCRYPTION_FLAG"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="extensionCount">Extension Count:</label>
+                </b-col>
+                <b-col>
+                  <b-input id="extensionCount" v-model="selectedItem.segment.EXTENSION_COUNT"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="globalBufferCount">
+                    Global Buffer Count (blocks):
+                  </label>
+                </b-col>
+                <b-col>
+                  <b-input
+                           id="globalBufferCount"
+                           v-model="selectedItem.segment.GLOBAL_BUFFER_COUNT"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="lockSpace">Lock Space (pages):</label>
+                </b-col>
+                <b-col>
+                  <b-input id="lockSpace" v-model="selectedItem.segment.LOCK_SPACE"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="mutexSlots">Mutex Slots:</label>
+                </b-col>
+                <b-col>
+                  <b-input id="mutexSlots" v-model="selectedItem.segment.MUTEX_SLOTS"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="reservedBytes">Reserved Bytes:</label>
+                </b-col>
+                <b-col>
+                  <b-input id="reservedBytes" v-model="selectedItem.segment.RESERVED_BYTES"/>
+                </b-col>
+              </b-row>
+            </b-input-group>
 
-          <!-- Add Region -->
-          <b-input-group v-if="addType==='region'">
-            <b-row>
-              <b-col>
-                <label for="region">Region:</label>
-              </b-col>
-              <b-col>
-                <b-input id="region"
-                              v-model="selectedItem.region.NAME"
-                              :value="selectedItem.region.NAME"
-                              @input="forceUpper($event, selectedItem.region, 'NAME')"
-                              style="text-transform: uppercase;"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="segment">Segment:</label>
-              </b-col>
-              <b-col>
-                <b-select id="segment"
-                          :options="segments"
-                          v-model="selectedItem.region.DYNAMIC_SEGMENT"
-                          :value="selectedItem.region.DYNAMIC_SEGMENT"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="autodb">AutoDB:</label>
-              </b-col>
-              <b-col>
-                <b-check id="autodb" v-model="selectedItem.region.AUTODB"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="collationDefault">
-                  Collation Default:
-                </label>
-              </b-col>
-              <b-col>
-                <b-input id="collationDefault" v-model="selectedItem.region.COLLATION_DEFAULT"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="epochTaper">Epoch Taper:</label>
-              </b-col>
-              <b-col>
-                <b-check id="epochTaper" v-model="selectedItem.region.EPOCHTAPER"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="instFreezeOnError">
-                  Instance Freeze on Error:
-                </label>
-              </b-col>
-              <b-col>
-                <b-check id="instFreezeOnError" v-model="selectedItem.region.INST_FREEZE_ON_ERROR"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="journal">
-                  Journal Option List:
-                </label>
-              </b-col>
-              <b-col>
-                <b-input id="journal" v-model="selectedItem.region.JOURNAL"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="autoSwitchLimit">
-                  Auto Switch Limit:
-                </label>
-              </b-col>
-              <b-col>
-                <b-input id="autoSwitchLimit" v-model="selectedItem.region.AUTOSWITCHLIMIT"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="beforeImage">Before Image:</label>
-              </b-col>
-              <b-col>
-                <b-check v-model="selectedItem.region.BEFORE_IMAGE"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="journalFileName">
-                  Journal File Name:
-                </label>
-              </b-col>
-              <b-col>
-                <b-input id="journalFileName" v-model="selectedItem.region.FILE_NAME"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="keySize">Key Size (bytes):</label>
-              </b-col>
-              <b-col>
-                <b-input id="keySize" v-model="selectedItem.region.KEY_SIZE"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="lockCrit">Lock Crit:</label>
-              </b-col>
-              <b-col>
-                <b-check id="lockCrit" v-model="selectedItem.region.LOCK_CRIT_SEPARATE"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="nullSubscripts">Null Subscripts:</label>
-              </b-col>
-              <b-col>
-                <b-select
-                  id="nullSubscripts"
-                  v-model="selectedItem.region.NULL_SUBSCRIPTS"
-                  :options="regionNullSubscriptsOptions"
-                  :value="selectedItem.region.NULL_SUBSCRIPTS"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="qDbRundown">
-                  Quick Database Rundown:
-                </label>
-              </b-col>
-              <b-col>
-                <b-check id="qDbRundown" v-model="selectedItem.region.QDBRUNDOWN"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="recordSize">Record Size (bytes):</label>
-              </b-col>
-              <b-col>
-                <b-input id="recordSize" v-model="selectedItem.region.RECORD_SIZE"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="stats">Record Size (bytes):</label>
-              </b-col>
-              <b-col>
-                <b-check id="stats" v-model="selectedItem.region.STATS"/>
-              </b-col>
-              <!-- Row Break -->
-              <div class="w-100"></div>
-              <b-col>
-                <label for="standardNullCollation">
-                  Standard Null Collation:
-                </label>
-              </b-col>
-              <b-col>
-                <b-check id="standardNullCollation" v-model="selectedItem.region.STDNULLCOLL"/>
-              </b-col>
-            </b-row>
-          </b-input-group>
-        </b-form-group>
+            <!-- Add Region -->
+            <b-input-group v-if="addType==='region'">
+              <b-row>
+                <b-col>
+                  <label for="region">Region:</label>
+                </b-col>
+                <b-col>
+                  <b-input id="region"
+                                v-model="selectedItem.region.NAME"
+                                :value="selectedItem.region.NAME"
+                                @input="forceUpper($event, selectedItem.region, 'NAME')"
+                                style="text-transform: uppercase;"
+                                :state="!$v.selectedItem.region.NAME.$invalid"
+                                aria-describedby="nameLiveFeedback"/>
+                  <b-form-invalid-feedback id="nameLiveFeedback">
+                    This is a required field
+                  </b-form-invalid-feedback>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="segment">Segment:</label>
+                </b-col>
+                <b-col>
+                  <b-select id="segment"
+                            :options="segments"
+                            v-model="selectedItem.region.DYNAMIC_SEGMENT"
+                            :value="selectedItem.region.DYNAMIC_SEGMENT"
+                            :state="!$v.selectedItem.region.DYNAMIC_SEGMENT.$invalid"
+                            aria-describedby="dynamicSegmentLiveFeedback"/>
+                  <b-form-invalid-feedback id="dynamicSegmentLiveFeedback">
+                    This is a required field
+                  </b-form-invalid-feedback>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="autodb">AutoDB:</label>
+                </b-col>
+                <b-col>
+                  <b-check id="autodb" v-model="selectedItem.region.AUTODB"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="collationDefault">
+                    Collation Default:
+                  </label>
+                </b-col>
+                <b-col>
+                  <b-input id="collationDefault" v-model="selectedItem.region.COLLATION_DEFAULT"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="epochTaper">Epoch Taper:</label>
+                </b-col>
+                <b-col>
+                  <b-check id="epochTaper" v-model="selectedItem.region.EPOCHTAPER"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="instFreezeOnError">
+                    Instance Freeze on Error:
+                  </label>
+                </b-col>
+                <b-col>
+                  <b-check id="instFreezeOnError"
+                           v-model="selectedItem.region.INST_FREEZE_ON_ERROR"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="journal">
+                    Journal Option List:
+                  </label>
+                </b-col>
+                <b-col>
+                  <b-input id="journal" v-model="selectedItem.region.JOURNAL"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="autoSwitchLimit">
+                    Auto Switch Limit:
+                  </label>
+                </b-col>
+                <b-col>
+                  <b-input id="autoSwitchLimit" v-model="selectedItem.region.AUTOSWITCHLIMIT"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="beforeImage">Before Image:</label>
+                </b-col>
+                <b-col>
+                  <b-check v-model="selectedItem.region.BEFORE_IMAGE"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="journalFileName">
+                    Journal File Name:
+                  </label>
+                </b-col>
+                <b-col>
+                  <b-input id="journalFileName" v-model="selectedItem.region.FILE_NAME"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="keySize">Key Size (bytes):</label>
+                </b-col>
+                <b-col>
+                  <b-input id="keySize" v-model="selectedItem.region.KEY_SIZE"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="lockCrit">Lock Crit:</label>
+                </b-col>
+                <b-col>
+                  <b-check id="lockCrit" v-model="selectedItem.region.LOCK_CRIT_SEPARATE"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="nullSubscripts">Null Subscripts:</label>
+                </b-col>
+                <b-col>
+                  <b-select
+                    id="nullSubscripts"
+                    v-model="selectedItem.region.NULL_SUBSCRIPTS"
+                    :options="regionNullSubscriptsOptions"
+                    :value="selectedItem.region.NULL_SUBSCRIPTS"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="qDbRundown">
+                    Quick Database Rundown:
+                  </label>
+                </b-col>
+                <b-col>
+                  <b-check id="qDbRundown" v-model="selectedItem.region.QDBRUNDOWN"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="recordSize">Record Size (bytes):</label>
+                </b-col>
+                <b-col>
+                  <b-input id="recordSize" v-model="selectedItem.region.RECORD_SIZE"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="stats">Record Size (bytes):</label>
+                </b-col>
+                <b-col>
+                  <b-check id="stats" v-model="selectedItem.region.STATS"/>
+                </b-col>
+                <!-- Row Break -->
+                <div class="w-100"></div>
+                <b-col>
+                  <label for="standardNullCollation">
+                    Standard Null Collation:
+                  </label>
+                </b-col>
+                <b-col>
+                  <b-check id="standardNullCollation" v-model="selectedItem.region.STDNULLCOLL"/>
+                </b-col>
+              </b-row>
+            </b-input-group>
+          </b-form-group>
+        </b-form>
         <div slot="modal-footer" >
-          <b-btn size="sm" variant="primary" @click="ok(addType)">OK</b-btn>
+          <b-btn size="sm"
+                 variant="primary"
+                 @click="ok(addType)"
+                 :disabled="$v.selectedItem.$invalid">OK</b-btn>
           <b-btn size="sm" variant="warning" @click="cancel()">Cancel</b-btn>
       </div>
     </b-modal>
@@ -810,7 +848,8 @@
               </label>
             </b-col>
             <b-col>
-              <b-check id="instFreezeOnError" v-model="selectedItem.region.INST_FREEZE_ON_ERROR"/>
+              <b-check id="instFreezeOnError"
+                       v-model="selectedItem.region.INST_FREEZE_ON_ERROR"/>
             </b-col>
             <!-- Row Break -->
             <div class="w-100"></div>
@@ -872,11 +911,10 @@
               <label for="nullSubscripts">Null Subscripts:</label>
             </b-col>
             <b-col>
-              <b-select
-                id="nullSubscripts"
-                v-model="selectedItem.region.NULL_SUBSCRIPTS"
-                :options="regionNullSubscriptsOptions"
-                :value="selectedItem.region.NULL_SUBSCRIPTS"/>
+              <b-select id="nullSubscripts"
+                        v-model="selectedItem.region.NULL_SUBSCRIPTS"
+                        :options="regionNullSubscriptsOptions"
+                        :value="selectedItem.region.NULL_SUBSCRIPTS"/>
             </b-col>
             <!-- Row Break -->
             <div class="w-100"></div>
@@ -940,6 +978,8 @@
 
 <script>
 import axios from 'axios';
+import { validationMixin } from 'vuelidate';
+import { required } from 'vuelidate/lib/validators';
 
 const regions = [''];
 const segments = [''];
@@ -1076,6 +1116,55 @@ export default {
         .filter(f => f.sortable)
         .map(f => ({ text: f.label, value: f.key }));
     },
+  },
+  mixins: [
+    validationMixin,
+  ],
+  validations() {
+    switch (this.addType) {
+      case 'name':
+        return {
+          selectedItem: {
+            name: {
+              NAME: {
+                required,
+              },
+              REGION: {
+                required,
+              },
+            },
+          },
+        };
+      case 'segment':
+        return {
+          selectedItem: {
+            segment: {
+              NAME: {
+                required,
+              },
+              FILE_NAME: {
+                required,
+              },
+            },
+          },
+        };
+      case 'region':
+        return {
+          selectedItem: {
+            region: {
+              NAME: {
+                required,
+              },
+              DYNAMIC_SEGMENT: {
+                required,
+              },
+            },
+          },
+        };
+      default:
+        break;
+    }
+    return {};
   },
   methods: {
     forceUpper(e, obj, prop) {
