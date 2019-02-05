@@ -1,4 +1,4 @@
-VPRJRUT ;SLC/KCM -- Utilities for HTTP communications ;2014-05-09  5:39 PM
+%webutils ;SLC/KCM -- Utilities for HTTP communications ;2019-01-23  5:04 PM
  ;;1.0;JSON DATA STORE;;Sep 01, 2012
  ;
  ; Various mods to support GT.M. See diff with original for full listing.
@@ -50,6 +50,7 @@ REFSIZE(ROOT) ; return the size of glvn passed in ROOT
  N SIZE,I
  S SIZE=0
  S ROOT=$NA(@ROOT)
+ I $P($SY,",")=47 G REFSIZEGTM
  I $D(@ROOT)#2 S SIZE=$L(@ROOT)
  ; I $D(@ROOT)>1 S I=0 F  S I=$O(@ROOT@(I)) Q:'I  S SIZE=SIZE+$L(@ROOT@(I))
  N ORIG,OL S ORIG=ROOT,OL=$QL(ROOT) ; Orig, Orig Length
@@ -57,62 +58,31 @@ REFSIZE(ROOT) ; return the size of glvn passed in ROOT
  S ROOT=ORIG
  Q SIZE
  ;
+REFSIZEGTM ; Refsize for GT.M/UTF-8
+ I $D(@ROOT)#2 S SIZE=$ZL(@ROOT)
+ ; I $D(@ROOT)>1 S I=0 F  S I=$O(@ROOT@(I)) Q:'I  S SIZE=SIZE+$L(@ROOT@(I))
+ N ORIG,OL S ORIG=ROOT,OL=$QL(ROOT) ; Orig, Orig Length
+ F  S ROOT=$Q(@ROOT) Q:ROOT=""  Q:($NA(@ROOT,OL)'=$NA(@ORIG,OL))  S SIZE=SIZE+$ZL(@ROOT)
+ S ROOT=ORIG
+ Q SIZE
+ ;
 VARSIZE(V) ; return the size of a variable
  Q:'$D(V) 0
  N SIZE,I
  S SIZE=0
+ I $P($SY,",")=47 G VARSIZEGTM
  I $D(V)#2 S SIZE=$L(V)
  I $D(V)>1 S I="" F  S I=$O(V(I)) Q:'I  S SIZE=SIZE+$L(V(I))
  Q SIZE
  ;
-PAGE(ROOT,START,LIMIT,SIZE,PREAMBLE) ; create the size and preamble for a page of data
- Q:'$D(ROOT) 0 Q:'$L(ROOT) 0
- N I,J,KEY,KINST,COUNT,TEMPLATE,PID
- K @ROOT@($J)
- S SIZE=0,COUNT=0,TEMPLATE=$G(@ROOT@("template"),0),PID=$G(@ROOT@("pid"))
- F I=START:1:(START+LIMIT-1) Q:'$D(@ROOT@("data",I))  S COUNT=COUNT+1 D
- . S KEY="" F  S KEY=$O(@ROOT@("data",I,KEY)) Q:KEY=""  D
- . . S KINST="" F  S KINST=$O(@ROOT@("data",I,KEY,KINST)) Q:KINST=""  D
- . . . S PID=^(KINST)  ; null if non-pt data
- . . . D TMPLT(ROOT,TEMPLATE,I,KEY,KINST,PID)
- . . . S J="" F  S J=$O(@ROOT@($J,I,J)) Q:'J  S SIZE=SIZE+$L(@ROOT@($J,I,J))
- S PREAMBLE=$$BLDHEAD(@ROOT@("total"),COUNT,START,LIMIT)
- ; add 3 for "]}}", add COUNT-1 for commas
- S SIZE=SIZE+$L(PREAMBLE)+3+COUNT-$S('COUNT:0,1:1)
- Q
-TMPLT(ROOT,TEMPLATE,ITEM,KEY,KINST,PID) ; set template
- I HTTPREQ("store")="data" G TLT4DATA
-TLT4VPR ;
- ; called from PAGE
- I $G(TEMPLATE)="uid" S @ROOT@($J,ITEM,1)="{""uid"":"""_KEY_"""}" Q
- ; other template
- I $L(TEMPLATE),$D(^VPRPT("TEMPLATE",PID,KEY,TEMPLATE)) M @ROOT@($J,ITEM)=^(TEMPLATE) Q
- ; else full object
- M @ROOT@($J,ITEM)=^VPRPT("JSON",PID,KEY)
- Q
-TLT4DATA ;
- ; called from PAGE
- I $G(TEMPLATE)="uid" S @ROOT@($J,ITEM,1)="{""uid"":"""_KEY_"""}" Q
- ; other template
- I $L(TEMPLATE),$D(^VPRJD("TEMPLATE",KEY,TEMPLATE)) M @ROOT@($J,ITEM)=^(TEMPLATE) Q
- ; else full object
- M @ROOT@($J,ITEM)=^VPRJD("JSON",KEY)
- Q
-BLDHEAD(TOTAL,COUNT,START,LIMIT) ; Build the object header
- N X,UPDATED
- S UPDATED=$P($$FMTHL7^XLFDT($$NOW^XLFDT),"+")
- S X="{""apiVersion"":""1.0"",""data"":{""updated"":"_UPDATED_","
- S X=X_"""totalItems"":"_TOTAL_","
- S X=X_"""currentItemCount"":"_COUNT_","
- I LIMIT'=999999 D  ; only set thise if paging
- . S X=X_"""itemsPerPage"":"_LIMIT_","
- . S X=X_"""startIndex"":"_START_","
- . S X=X_"""pageIndex"":"_(START\LIMIT)_","
- . S X=X_"""totalPages"":"_(TOTAL\LIMIT+$S(TOTAL#LIMIT:1,1:0))_","
- S X=X_"""items"":["
- Q X
+VARSIZEGTM ; Varsize for GT.M/UTF-8
+ I $D(V)#2 S SIZE=$ZL(V)
+ I $D(V)>1 S I="" F  S I=$O(V(I)) Q:'I  S SIZE=SIZE+$ZL(V(I))
+ Q SIZE
  ;
+setError(ERRCODE,MESSAGE,ERRARRAY) G setError1
 SETERROR(ERRCODE,MESSAGE,ERRARRAY) ; set error info into ^TMP("HTTPERR",$J)
+setError1 ;
  ; causes HTTPERR system variable to be set
  ; ERRCODE:  query errors are 100-199, update errors are 200-299, M errors are 500
  ; MESSAGE:  additional explanatory material
@@ -159,8 +129,9 @@ SETERROR(ERRCODE,MESSAGE,ERRARRAY) ; set error info into ^TMP("HTTPERR",$J)
  I '$L($G(ERRNAME)) S ERRNAME="Unknown error"
  ;
  I ERRCODE>500 S HTTPERR=500,TOPMSG="Internal Server Error"  ; M Server Error
- I ERRCODE<500,ERRCODE>400 S HTTPERR=ERRCODE,TOPMSG=ERRNAME  ; Other HTTP Errors 
- S NEXTERR=$G(TMP("HTTPERR",$J,0),0)+1,TMP("HTTPERR",$J,0)=NEXTERR
+ I ERRCODE<500,ERRCODE>400 S HTTPERR=ERRCODE,TOPMSG=ERRNAME  ; Other HTTP Errors
+ Q:$G(NOGBL)
+ S NEXTERR=$G(^TMP("HTTPERR",$J,0),0)+1,^TMP("HTTPERR",$J,0)=NEXTERR
  S ^TMP("HTTPERR",$J,1,"apiVersion")="1.0"
  S ^TMP("HTTPERR",$J,1,"error","code")=HTTPERR
  S ^TMP("HTTPERR",$J,1,"error","message")=TOPMSG
@@ -172,20 +143,6 @@ SETERROR(ERRCODE,MESSAGE,ERRARRAY) ; set error info into ^TMP("HTTPERR",$J)
  Q
  ;
  ; Cache specific functions (selected one support GT.M too!)
- ;
-LCLHOST() ; return TRUE if the peer connection is localhost
- I $E($I,1,5)'="|TCP|" Q 0
- N VER,ADDR
- S VER=$P($P($ZV,") ",2),"(")
- I VER<2011 S ADDR=$ZU(111,0),ADDR=$A(ADDR,1)_"."_$A(ADDR,2)_"."_$A(ADDR,3)_"."_$A(ADDR,4) I 1
- E  S ADDR=$SYSTEM.TCPDevice.PeerAddr(0)
- I ADDR="127.0.0.1" Q 1
- I ADDR="0:0:0:0:0:0:0:1" Q 1
- I ADDR="::1" Q 1
- Q 0
- ;
-HASH(X) ; return CRC-32 of string contained in X
- Q $$CRC32(X) ; return the CRC-32 value; works on both Cache 
  ;
 GMT() ; return HTTP date string (this is really using UTC instead of GMT)
  N TM,DAY
@@ -202,19 +159,6 @@ GMT() ; return HTTP date string (this is really using UTC instead of GMT)
  ;
  QUIT "UNIMPLEMENTED"
  ;
-SYSID() ; return a likely unique system ID
- S X=$SYSTEM_":"_$G(^VPRHTTP("port"),9080) ; VPR web server port number
- QUIT $$CRC16HEX(X) ; return CRC-16 in hex
- ;
- ;
-CRC16HEX(X) ; return CRC-16 in hexadecimal
- QUIT $$BASE($$CRC16(X),10,16) ; return CRC-16 in hex
- ;
- ;
-CRC32HEX(X) ; return CRC-32 in hexadecimal
- QUIT $$BASE($$CRC32(X),10,16) ; return CRC-32 in hex
- ;
- ;
  ;
 DEC2HEX(NUM) ; return a decimal number as hex
  Q $$BASE(NUM,10,16)
@@ -224,49 +168,6 @@ HEX2DEC(HEX) ; return a hex number as decimal
  Q $$BASE(HEX,16,10)
  ;Q $ZHEX(HEX_"H")
  ;
-WR4HTTP ; open file to save HTTP response
- I $$UP($ZV)["CACHE" O "VPRJT.TXT":"WNS"
- I $$UP($ZV)["GT.M" O "VPRJT.TXT":(newversion)
- U "VPRJT.TXT"
- Q
-RD4HTTP() ; read HTTP body from file and return as value
- N X
- I $$UP($ZV)["CACHE" O "VPRJT.TXT":"RSD" ; read sequential and delete afterwards
- I $$UP($ZV)["GT.M" O "VPRJT.TXT":(readonly:rewind) ; read sequential from the top.
- U "VPRJT.TXT"
- F  R X:1 S X=$TR(X,$C(13)) Q:'$L(X)  ; read lines until there is an empty one ($TR for GT.M)
- R X:2              ; now read the JSON object
- I $$UP($ZV)["GT.M" C "VPRJT.TXT":(delete) U $P
- I $$UP($ZV)["CACHE" D C4HTTP
- Q X
- ;
-C4HTTP ; close file used for HTTP response
- C "VPRJT.TXT" U $P
- Q
-CRC32(string,seed) ;
- ; Polynomial X**32 + X**26 + X**23 + X**22 +
- ;          + X**16 + X**12 + X**11 + X**10 +
- ;          + X**8  + X**7  + X**5  + X**4 +
- ;          + X**2  + X     + 1
- N I,J,R
- I '$D(seed) S R=4294967295
- E  I seed'<0,seed'>4294967295 S R=4294967295-seed
- E  S $ECODE=",M28,"
- F I=1:1:$L(string) D
- . S R=$$XOR($A(string,I),R,8)
- . F J=0:1:7 D
- . . I R#2 S R=$$XOR(R\2,3988292384,32)
- . . E  S R=R\2
- . . Q
- . Q
- Q 4294967295-R
-XOR(a,b,w) N I,M,R
- S R=b,M=1
- F I=1:1:w D
- . S:a\M#2 R=R+$S(R\M#2:-M,1:M)
- . S M=M+M
- . Q
- Q R
 BASE(%X1,%X2,%X3) ;Convert %X1 from %X2 base to %X3 base
  I (%X2<2)!(%X2>16)!(%X3<2)!(%X3>16) Q -1
  Q $$CNV($$DEC(%X1,%X2),%X3)
@@ -278,20 +179,6 @@ CNV(N,B) ;Cnv N from 10 to B
  Q:B=10 N N I,Y S Y=""
  F I=1:1 S Y=$E("0123456789ABCDEF",N#B+1)_Y,N=N\B Q:N<1
  Q Y
-CRC16(string,seed) ;
- ; Polynomial x**16 + x**15 + x**2 + x**0
- N I,J,R
- I '$D(seed) S R=0
- E  I seed'<0,seed'>65535 S R=seed\1
- E  S $ECODE=",M28,"
- F I=1:1:$L(string) D
- . S R=$$XOR($A(string,I),R,8)
- . F J=0:1:7 D
- . . I R#2 S R=$$XOR(R\2,40961,16)
- . . E  S R=R\2
- . . Q
- . Q
- Q R
  ;
 HTFM(%H,%F) ;$H to FM, %F=1 for date only
  N X,%,%T,%Y,%M,%D S:'$D(%F) %F=0
@@ -388,22 +275,6 @@ ADDCRLF(RESULT) ; Add CRLF to each line
  . N V S V=$NA(RESULT) F  S V=$Q(@V) Q:V=""  S @V=@V_$C(13,10)
  QUIT
  ;
-TESTCRLF
- S RESULT=$NA(^TMP($J))
- K @RESULT
- S ^TMP($J,1)="HELLO"
- S ^TMP($J,2)="WORLD"
- S ^TMP($J,3)=""
- D ADDCRLF(.RESULT)
- ZWRITE @RESULT@(*)
- K RESULT
- S RESULT="HELLO"
- S RESULT(1)="WORLD"
- S RESULT(2)="BYE"
- S RESULT(3)=""
- D ADDCRLF(.RESULT)
- ZWRITE RESULT
- QUIT
 UNKARGS(ARGS,LIST) ; returns true if any argument is unknown
  N X,UNKNOWN
  S UNKNOWN=0,LIST=","_LIST_","
@@ -436,3 +307,84 @@ DECODE64(X) ;
  .S RGZ1=RGZ1_RGZ6
  Q $E(RGZ1,1,$L(RGZ1)-$L(X,"=")+1)
 INIT64() Q "=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+ ;
+addService(method,urlPattern,routine,auth,authKey,authOption,params) ; [Public: Add Service Entry Point]
+ ; pass all by value except params by ref
+ ; do or $$; return if $$ is 0 for failure and ien for success
+ ; param format:
+ ; - param(1)="U^rpc" URL Component named RPC
+ ; - param(2)="F^start" Form Body variable called start
+ ; - param(3)="Q^dir" HTTP Query variable called dir
+ ; - param(4)="B"     Pass the body
+ set method=$get(method)
+ set urlPattern=$get(urlPattern)
+ set routine=$get(routine)
+ ;
+ ; validate method
+ if "^GET^POST^PUT^OPTIONS^DELETE^TRACE^HEAD^CONNECT^"'["^"_method_"^" quit:$q 0 q
+ ;
+ ; if urlPattern or routine are empty, bad call
+ if urlPattern=""!(routine="") quit:$q 0 q
+ ;
+ ; Lock for edits
+ if $P($SY,",")=47 tstart ():serial
+ else  lock +^%webutils:1 else  quit:$q 0 q
+ ;
+ ; does it already exist; or add new entry
+ new ien
+ if $data(^%web(17.6001,"B",method,urlPattern)) do
+ . new routine set routine=$order(^%web(17.6001,"B",method,urlPattern,""))
+ . set ien=$order(^%web(17.6001,"B",method,urlPattern,routine,0))
+ . kill ^%web(17.6001,"B",method,urlPattern)
+ . set $piece(^%web(17.6001,0),"^",3)=ien
+ else  do 
+ . set ien=$o(^%web(17.6001," "),-1)+1
+ . set $piece(^%web(17.6001,0),"^",3,4)=ien_"^"_ien
+ ;
+ ; now add the entry at this ien
+ ; kill old one first
+ kill ^%web(17.6001,ien)
+ ;
+ ; Add new one
+ set ^%web(17.6001,ien,0)=method
+ set ^%web(17.6001,ien,1)=urlPattern
+ set ^%web(17.6001,ien,2)=routine
+ set ^%web(17.6001,"B",method,urlPattern,routine,ien)=""
+ ;
+ ; Add Auth nodes
+ if $text(^XUS)'="" do
+ . if $g(auth)           set $piece(^%web(17.6001,ien,"AUTH"),"^",1)=1
+ . if $g(authKey)'=""    set $piece(^%web(17.6001,ien,"AUTH"),"^",2)=$$FIND1^DIC(19.1,,"QX",authKey,"B")
+ . if $g(authOption)'="" set $piece(^%web(17.6001,ien,"AUTH"),"^",3)=$$FIND1^DIC(19,,"QX",authOption,"B")
+ ;
+ ; Add Params
+ if $order(params("")) do
+ . new n for n=0:0 set n=$order(params(n)) quit:'n  set ^%web(17.6001,ien,"PARAMS",n,0)=params(n)
+ . new lastn s lastn=+$order(params(""),-1)
+ . set ^%web(17.6001,ien,"PARAMS",0)="^17.60012S^"_lastn_"^"_lastn
+ ;
+ ; Commit our changes and unlock
+ if $P($SY,",")=47 tcommit
+ else  lock -^%webutils
+ ;
+ ; Return IEN
+ quit:$quit ien quit
+ ;
+deleteService(method,urlPattern) ; [Public: Delete Service]
+ set method=$get(method)
+ set urlPattern=$get(urlPattern)
+ if method="" quit
+ if urlPattern="" quit
+ ;
+ new ien
+ if $P($SY,",")=47 tstart ():serial
+ if $data(^%web(17.6001,"B",method,urlPattern)) do
+ . new routine set routine=$order(^%web(17.6001,"B",method,urlPattern,""))
+ . set ien=$order(^%web(17.6001,"B",method,urlPattern,routine,0))
+ . kill ^%web(17.6001,"B",method,urlPattern)
+ . kill ^%web(17.6001,ien)
+ . set $piece(^%web(17.6001,0),"^",3)=ien
+ . set $piece(^%web(17.6001,0),"^",4)=$piece(^%web(17.6001,0),"^",4)-1
+ if $P($SY,",")=47 tcommit
+ ;
+ quit

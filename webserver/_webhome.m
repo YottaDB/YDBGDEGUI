@@ -1,11 +1,12 @@
-%WHOME ; VEN/SMH - Home page processor; 25 NOV 2013
+%webhome ; VEN/SMH - Home page processor;2019-01-23  12:30 PM
  ;;
  ;
-EN(RESULT) ; PEP
+en(RESULT) ; PEP
+ S RESULT("mime")="text/html; charset=utf-8"
  N CRLF S CRLF=$C(13,10)
  N ARGS S ARGS("*")="index.html"
  ; Retrieve index.html from filesystem before returning default page
- D FILESYS^%W0(.RESULT,.ARGS)
+ D FILESYS^%webapi(.RESULT,.ARGS)
  I $D(^TMP("HTTPERR",$J)) K ^TMP("HTTPERR",$J),HTTPERR,RESULT
  ; If we found an index.html don't return the default
  I $D(RESULT) QUIT
@@ -13,24 +14,24 @@ EN(RESULT) ; PEP
  S RESULT("mime")="text/html; charset=utf-8"
  N I F I=1:1 S RESULT(I)=$P($TEXT(HTML+I),";;",2,99) Q:RESULT(I)=""  D
  . I RESULT(I)["<%TABLEDATA%>" D
- .. N IEN S IEN=0 F J=I:.0001 S IEN=$O(^%W(17.6001,IEN)) Q:'IEN  D
+ .. N IEN S IEN=0 F J=I:.0001 S IEN=$O(^%web(17.6001,IEN)) Q:'IEN  D
  ... S RESULT(J)="<tr>",J=J+.0001
- ... S RESULT(J)="<td>"_^%W(17.6001,IEN,0)_"</td>",J=J+.0001
- ... S RESULT(J)="<td>"_^%W(17.6001,IEN,1)_"</td>",J=J+.0001
+ ... S RESULT(J)="<td>"_^%web(17.6001,IEN,0)_"</td>",J=J+.0001
+ ... S RESULT(J)="<td>"_^%web(17.6001,IEN,1)_"</td>",J=J+.0001
  ... ;
- ... N EP S EP=^%W(17.6001,IEN,2) N RTN S RTN=$P(EP,"^",2),RTN=$$URLENC^VPRJRUT(RTN)
+ ... N EP S EP=^%web(17.6001,IEN,2) N RTN S RTN=$P(EP,"^",2),RTN=$$URLENC^%webutils(RTN)
  ... S RESULT(J)="<td><a href=""r/"_RTN_""">"_EP_"</td>",J=J+.0001
  ... ;
- ... N AUTH S AUTH=$P($G(^%W(17.6001,IEN,"AUTH")),"^",1),AUTH=$S(AUTH:"YES",1:"NO")
+ ... N AUTH S AUTH=$P($G(^%web(17.6001,IEN,"AUTH")),"^",1),AUTH=$S(AUTH:"YES",1:"NO")
  ... S RESULT(J)="<td>"_AUTH_"</td>",J=J+.0001
  ... ;
- ... N KEY S KEY=$P($G(^%W(17.6001,IEN,"AUTH")),"^",2) I KEY S KEY=$P($G(^DIC(19.1,KEY,0)),"^")
+ ... N KEY S KEY=$P($G(^%web(17.6001,IEN,"AUTH")),"^",2) I KEY S KEY=$P($G(^DIC(19.1,KEY,0)),"^")
  ... S RESULT(J)="<td>"_KEY_"</td>",J=J+.0001
  ... ;
- ... N RKEY S RKEY=$P($G(^%W(17.6001,IEN,"AUTH")),"^",3) I RKEY S RKEY=$P($G(^DIC(19.1,RKEY,0)),"^")
+ ... N RKEY S RKEY=$P($G(^%web(17.6001,IEN,"AUTH")),"^",3) I RKEY S RKEY=$P($G(^DIC(19.1,RKEY,0)),"^")
  ... S RESULT(J)="<td>"_RKEY_"</td>",J=J+.0001
  ... ;
- ... N OPT S OPT=$P($G(^%W(17.6001,IEN,"AUTH")),"^",4) I OPT S OPT=$P($G(^DIC(19,OPT,0)),"^")
+ ... N OPT S OPT=$P($G(^%web(17.6001,IEN,"AUTH")),"^",4) I OPT S OPT=$P($G(^DIC(19,OPT,0)),"^")
  ... S RESULT(J)="<td>"_OPT_"</td>",J=J+.0001
  ... ;
  ... S RESULT(J)="</tr>"
