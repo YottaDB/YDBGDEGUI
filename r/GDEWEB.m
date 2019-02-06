@@ -20,8 +20,8 @@
 WEB(portnum)
 	i $l($zcmdline)&($zcmdline=+$zcmdline) s portnum=$zcmdline
 	i '$l(portnum)  w "No port number specified, or invalid - using default of 8080",!
-	d:$l($t(^VPRJREQ)) JOB^VPRJREQ($g(portnum,8080),"ydbgui")
-	w:'$l($t(^VPRJREQ)) "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
+	d:$l($t(^%webreq)) job^%webreq($g(portnum,8080),"ydbgui")
+	w:'$l($t(^%webreq)) "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
 	q
 ;
 ; Stops the HTTP(S) server that serves the GUI files and web services
@@ -115,8 +115,8 @@ get(RESULT,ARGS)
 	n i
 	f i=2:1:$l(accmeth,"\") s result("accessMethods",i-1)=$zpi(accmeth,"\",i)
 	;
-	d ENCODE^VPRJSON("result","RESULT","ERR")
-	i $d(ERR) D SETERROR^VPRJRER(201) quit
+	d ENCODE^%webjson("result","RESULT","ERR")
+	i $d(ERR) D SETERROR^%webutils(201) quit
 	quit
 ;
 ; Delete given global directory element(s)
@@ -148,9 +148,9 @@ delete(ARGS,BODY,RESULT)
 	n v533,v534,v542,v550,v5ft1,v600,v621,v631,v63a,ver,x,y,map,map2,mapdisp,s1,s2,l1,j
 	n attr,filetype,gdeputzs,gdexcept,maxs,record,ref,sreg,tempfile
 	;
-	i (($d(BODY)=0)!($d(BODY)=1))&($g(BODY)="") D SETERROR^VPRJRER(301,"BODY") quit ""
-	d DECODE^VPRJSON("BODY","JSON","ERR")
-	i $d(ERR) D SETERROR^VPRJRER(200) quit ""
+	i (($d(BODY)=0)!($d(BODY)=1))&($g(BODY)="") D SETERROR^%webutils(301,"BODY") quit ""
+	d DECODE^%webjson("BODY","JSON","ERR")
+	i $d(ERR) D SETERROR^%webutils(202) quit ""
 	;
 	; setup required variables
 	s gdequiet=1
@@ -180,8 +180,8 @@ delete(ARGS,BODY,RESULT)
 	s RSLT("verifyStatus")=verifyStatus
 	m RSLT("getMapData")=getMapData
 	m RSLT("errors")=gdeweberror
-	d ENCODE^VPRJSON("RSLT","RESULT","ERR")
-	i $d(ERR) D SETERROR^VPRJRER(201) quit ""
+	d ENCODE^%webjson("RSLT","RESULT","ERR")
+	i $d(ERR) D SETERROR^%webutils(201) quit ""
 	quit ""
 ;
 ; Internal line tag for delete line tag that deletes a single item from the global directory.
@@ -234,9 +234,9 @@ save(ARGS,BODY,RESULT)
 	n v533,v534,v542,v550,v5ft1,v600,v621,v631,v63a,ver,x,y,map,map2,mapdisp,s1,s2,l1,j
 	n attr,filetype,gdeputzs,gdexcept,maxs,record,ref,sreg,tempfile
 	;
-	i (($d(BODY)=0)!($d(BODY)=1))&($g(BODY)="") D SETERROR^VPRJRER(301,"BODY") quit ""
-	d DECODE^VPRJSON("BODY","JSON","ERR")
-	i $d(ERR) D SETERROR^VPRJRER(200) quit ""
+	i (($d(BODY)=0)!($d(BODY)=1))&($g(BODY)="") D SETERROR^%webutils(301,"BODY") quit ""
+	d DECODE^%webjson("BODY","JSON","ERR")
+	i $d(ERR) D SETERROR^%webutils(202) quit ""
 	;
 	; setup required variables
 	s gdequiet=1
@@ -301,8 +301,8 @@ save(ARGS,BODY,RESULT)
 	; Prepare result
 	s result("verifyStatus")=verifyStatus
 	m result("errors")=gdeweberror
-	d ENCODE^VPRJSON("result","RESULT","ERR")
-	i $d(ERR) D SETERROR^VPRJRER(201) quit ""
+	d ENCODE^%webjson("result","RESULT","ERR")
+	i $d(ERR) D SETERROR^%webutils(201) quit ""
 	quit ""
 ;
 ; Verify a given global directory
@@ -333,9 +333,9 @@ verify(ARGS,BODY,RESULT)
 	n tfile,tmpacc,tmpreg,tmpseg,tokens,typevalue,update,upper,v30,v44,v532
 	n v533,v534,v542,v550,v5ft1,v600,v621,v631,v63a,ver,x,y,map,map2,mapdisp,s1,s2,l1,j
 	;
-	i (($d(BODY)=0)!($d(BODY)=1))&($g(BODY)="") D SETERROR^VPRJRER(301,"BODY") quit ""
-	d DECODE^VPRJSON("BODY","JSON","ERR")
-	i $d(ERR) D SETERROR^VPRJRER(200) quit ""
+	i (($d(BODY)=0)!($d(BODY)=1))&($g(BODY)="") D SETERROR^%webutils(301,"BODY") quit ""
+	d DECODE^%webjson("BODY","JSON","ERR")
+	i $d(ERR) D SETERROR^%webutils(202) quit ""
 	;
 	; setup required variables
 	s gdequiet=1
@@ -440,8 +440,8 @@ verify(ARGS,BODY,RESULT)
 	i ('$g(gdewebquit))&($$ALL^GDEVERIF) s RSLT("verifyStatus")="true"
 	e  s RSLT("verifyStatus")="false"
 	m RSLT("errors")=gdeweberror
-	d ENCODE^VPRJSON("RSLT","RESULT","ERR")
-	i $d(ERR) D SETERROR^VPRJRER(201) quit ""
+	d ENCODE^%webjson("RSLT","RESULT","ERR")
+	i $d(ERR) D SETERROR^%webutils(201) quit ""
 	quit ""
 ;
 ; =========================================================================

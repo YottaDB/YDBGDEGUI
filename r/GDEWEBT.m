@@ -32,7 +32,7 @@ verify	;; @TEST Verify web service
 	s BODY=""
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT("",$g(RESULT),"Incorrect Response from Null Body")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(400,$g(HTTPERR),"Incorrect Response from Null Body")
 	d ASSERT(400,$g(^TMP("HTTPERR",$J,1,"error","code")),"Error code not set from Null Body")
 	d ASSERT(301,$g(^TMP("HTTPERR",$J,1,"error","errors",1,"reason")),"Reason code not set from Null Body")
@@ -45,7 +45,7 @@ verify	;; @TEST Verify web service
 	; d ASSERT("",$g(RESULT),"Incorrect Response from Null Body")
 	; d ASSERT(400,$g(HTTPERR),"Incorrect Response from Invalid JSON")
 	; d ASSERT(400,$g(^TMP("HTTPERR",$J,1,"error","code")),"Error code not set from Invalid JSON")
-	; d ASSERT(200,$g(^TMP("HTTPERR",$J,1,"error","errors",1,"reason")),"Reason code not set from Invalid JSON")
+	; d ASSERT(202,$g(^TMP("HTTPERR",$J,1,"error","errors",1,"reason")),"Reason code not set from Invalid JSON")
 	; d ASSERT(0,$d(^TMP("HTTPERR",$J,1,"error","errors",2,"reason")),"Too many errors set from Invalid JSON")
 	;
 	; Name with empty string for a region
@@ -53,7 +53,7 @@ verify	;; @TEST Verify web service
 	s BODY(1)="{""names"":{""ZZTEST"":""""}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Name with an empty string for a region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Name with an empty string for a region response")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Name with an empty string for a region")
 	d ASSERT("%GDE-E-QUALREQD, Region required",$g(JSON("errors",1)),"Expected error doesn't exist from Name with an empty string for a region")
@@ -64,7 +64,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""ZZTEST"":""TEMP""}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name response")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name")
 	d ASSERT(0,$d(JSON("errors")),"Receved an unexpected error from Valid Name")
@@ -75,7 +75,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""regions"":{""YOTTADB"":{""test"":""""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from region missing required attribute")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from region missing required attribute")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from region missing required attribute")
 	d ASSERT("%GDE-E-QUALREQD, Dynamic_segment required",$g(JSON("errors",1)),"Receved an unexpected error from region missing required attribute")
@@ -87,7 +87,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""regions"":{""YOTTADB"":{""DYNAMIC_SEGMENT"":""YOTTADB""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from region with required attribute - no segment")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from region with required attribute - no segment")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from region with required attribute - no segment")
 	d ASSERT("%GDE-I-MAPBAD, Dynamic segment YOTTADB for Region YOTTADB does not exist",$g(JSON("errors",1)),"Receved an unexpected error from region with required attribute - no segment")
@@ -100,7 +100,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""segments"":{""YOTTADB"":{""test"":""""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from segment missing required attribute")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from segment missing required attribute")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from segment missing required attribute")
 	d ASSERT("%GDE-E-QUALREQD, File required",$g(JSON("errors",1)),"Receved an unexpected error from segment missing required attribute")
@@ -112,7 +112,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""segments"":{""YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from segment with required attribute - no region, no access method")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from segment with required attribute - no region, no access method")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from segment with required attribute - no region, no access method")
 	d ASSERT("%GDE-I-QUALREQD, Access method required",$g(JSON("errors",1)),"Receved an unexpected error from segment with required attribute - no region, no access method")
@@ -126,7 +126,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""segments"":{""YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from segment with required attribute - no region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from segment with required attribute - no region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from segment with required attribute - no region")
 	d ASSERT("%GDE-I-MAPBAD, A REGION for SEGMENT YOTTADB does not exist",$g(JSON("errors",1)),"Receved an unexpected error from segment with required attribute - no region")
@@ -138,7 +138,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""ZZTEST"":""TEMP""},""segments"":{""-YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name, Invalid Segment")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name, Invalid Segment")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name, Invalid Segment")
 	d ASSERT("%GDE-E-PREFIXBAD, -YOTTADB - segment name must start with an alphabetic character",$g(JSON("errors",1)),"Receved an unexpected error from Valid Name, Invalid Segment")
@@ -150,7 +150,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""-ZZTEST"":""TEMP""},""segments"":{""YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Invalid Name, Valid Segment")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Invalid Name, Valid Segment")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Invalid Name, Valid Segment")
 	d ASSERT("%GDE-E-VALUEBAD, -ZZTEST is not a valid name",$g(JSON("errors",1)),"Receved an unexpected error from Invalid Name, Valid Segment")
@@ -162,7 +162,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""-ZZTEST"":""TEMP""},""segments"":{""-YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Invalid Name, Invalid Segment")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Invalid Name, Invalid Segment")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Invalid Name, Invalid Segment")
 	d ASSERT("%GDE-E-VALUEBAD, -ZZTEST is not a valid name",$g(JSON("errors",1)),"Receved an unexpected error from Invalid Name, Invalid Segment")
@@ -175,7 +175,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""ZZTEST"":""YOTTADB""},""segments"":{""YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name, Valid Segment")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name, Valid Segment")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name, Valid Segment")
 	d ASSERT("%GDE-I-MAPBAD, Region YOTTADB for Name ZZTEST does not exist",$g(JSON("errors",1)),"Receved an unexpected error from Valid Name, Valid Segment")
@@ -188,7 +188,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""-ZZTEST"":""YOTTADB""},""regions"":{""YOTTADB"":{""DYNAMIC_SEGMENT"":""YOTTADB""}},""segments"":{""YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Invalid Name, Valid Segment, Valid Region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Invalid Name, Valid Segment, Valid Region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Invalid Name, Valid Segment, Valid Region")
 	d ASSERT("%GDE-E-VALUEBAD, -ZZTEST is not a valid name",$g(JSON("errors",1)),"Receved an unexpected error from Invalid Name, Valid Segment, Valid Region")
@@ -200,7 +200,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""ZZTEST"":""YOTTADB""},""regions"":{""YOTTADB"":{""DYNAMIC_SEGMENT"":""YOTTADB""}},""segments"":{""-YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name, Invalid Segment, Valid Region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name, Invalid Segment, Valid Region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name, Invalid Segment, Valid Region")
 	d ASSERT("%GDE-E-PREFIXBAD, -YOTTADB - segment name must start with an alphabetic character",$g(JSON("errors",1)),"Receved an unexpected error from Valid Name, Invalid Segment, Valid Region")
@@ -212,7 +212,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""ZZTEST"":""YOTTADB""},""regions"":{""-YOTTADB"":{""DYNAMIC_SEGMENT"":""YOTTADB""}},""segments"":{""-YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name, Invalid Segment, Invalid Region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name, Invalid Segment, Invalid Region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name, Invalid Segment, Invalid Region")
 	d ASSERT("%GDE-E-PREFIXBAD, -YOTTADB - region name must start with an alphabetic character",$g(JSON("errors",1)),"Receved an unexpected error from Valid Name, Invalid Segment, Invalid Region")
@@ -225,7 +225,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""ZZTEST"":""YOTTADB""},""regions"":{""-YOTTADB"":{""DYNAMIC_SEGMENT"":""YOTTADB""}},""segments"":{""YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name, Valid Segment, Invalid Region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name, Valid Segment, Invalid Region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name, Valid Segment, Invalid Region")
 	d ASSERT("%GDE-E-PREFIXBAD, -YOTTADB - region name must start with an alphabetic character",$g(JSON("errors",1)),"Receved an unexpected error from Valid Name, Valid Segment, Invalid Region")
@@ -237,7 +237,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""ZZTEST"":""YOTTADB""},""regions"":{""YOTTADB"":{""DYNAMIC_SEGMENT"":""YOTTADB""}},""segments"":{""YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name, Valid Segment, Valid Region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name, Valid Segment, Valid Region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name, Valid Segment, Valid Region")
 	d ASSERT(0,$d(JSON("errors",1)),"Receved too many errors from Valid Name, Valid Segment, Valid Region")
@@ -248,7 +248,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""-ZZTEST"":""YOTTADB""},""regions"":{""-YOTTADB"":{""DYNAMIC_SEGMENT"":""YOTTADB""}},""segments"":{""-YOTTADB"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Invalid Name, Invalid Segment, Invalid Region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Invalid Name, Invalid Segment, Invalid Region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Invalid Name, Invalid Segment, Invalid Region")
 	d ASSERT("%GDE-E-VALUEBAD, -ZZTEST is not a valid name",$g(JSON("errors",1)),"Receved an unexpected error from Invalid Name, Invalid Segment, Invalid Region")
@@ -262,7 +262,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""regions"":{""yottadb"":{""DYNAMIC_SEGMENT"":""yottadb""}},""segments"":{""yottadb"":{""FILE_NAME"":""/tmp/yottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from lowercase Segment, lowercase Region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from lowercase Segment, lowercase Region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from lowercase Segment, lowercase Region")
 	d ASSERT("%GDE-I-MAPBAD, A NAME for REGION YOTTADB does not exist",$g(JSON("errors",1)),"Receved an unexpected error from lowercase Segment, lowercase Region")
@@ -275,7 +275,7 @@ verify	;; @TEST Verify web service
 	s BODY="{""names"":{""#"":""DEFAULT"",""*"":""DEFAULT"",""XTMP"":""TEMP""},""regions"":{""DEFAULT"":{""ALIGNSIZE"":4096,""ALLOCATION"":2048,""AUTODB"":0,""AUTOSWITCHLIMIT"":8386560,""BEFORE_IMAGE"":1,""BUFFER_SIZE"":2312,""COLLATION_DEFAULT"":0,""DYNAMIC_SEGMENT"":""DEFAULT"",""EPOCHTAPER"":1,""EPOCH_INTERVAL"":300,""EXTENSION"":2048,""FILE_NAME"":""/opt/yottadb/gui/j/vehu.mjl"",""INST_FREEZE_ON_ERROR"":0,""JOURNAL"":1,""KEY_SIZE"":1019,""LOCK_CRIT_SEPARATE"":1,""NULL_SUBSCRIPTS"":0,""QDBRUNDOWN"":0,""RECORD_SIZE"":16368,""STATS"":1,""STDNULLCOLL"":1,""SYNC_IO"":0,""YIELD_LIMIT"":8},""TEMP"":{""ALIGNSIZE"":4096,""ALLOCATION"":2048,""AUTODB"":0,""AUTOSWITCHLIMIT"":8386560,""BEFORE_IMAGE"":0,""BUFFER_SIZE"":2312,""COLLATION_DEFAULT"":0,""DYNAMIC_SEGMENT"":""TEMP"",""EPOCHTAPER"":1,""EPOCH_INTERVAL"":300,""EXTENSION"":2048,""FILE_NAME"":"""",""INST_FREEZE_ON_ERROR"":0,""JOURNAL"":0,""KEY_SIZE"":1019,""LOCK_CRIT_SEPARATE"":1,""NULL_SUBSCRIPTS"":0,""QDBRUNDOWN"":0,""RECORD_SIZE"":16368,""STATS"":1,""STDNULLCOLL"":1,""SYNC_IO"":0,""YIELD_LIMIT"":8}},""segments"":{""DEFAULT"":{""ACCESS_METHOD"":""BG"",""ALLOCATION"":200000,""ASYNCIO"":0,""BLOCK_SIZE"":4096,""BUCKET_SIZE"":"""",""DEFER"":"""",""DEFER_ALLOCATE"":1,""ENCRYPTION_FLAG"":0,""EXTENSION_COUNT"":1024,""FILE_NAME"":""/opt/yottadb/gui/g/vehu.dat"",""FILE_TYPE"":""DYNAMIC"",""GLOBAL_BUFFER_COUNT"":4096,""LOCK_SPACE"":400,""MUTEX_SLOTS"":1024,""RESERVED_BYTES"":0,""WINDOW_SIZE"":""""},""TEMP"":{""ACCESS_METHOD"":""MM"",""ALLOCATION"":10000,""ASYNCIO"":0,""BLOCK_SIZE"":4096,""BUCKET_SIZE"":"""",""DEFER"":1,""DEFER_ALLOCATE"":1,""ENCRYPTION_FLAG"":0,""EXTENSION_COUNT"":1024,""FILE_NAME"":""/opt/yottadb/gui/g/temp.dat"",""FILE_TYPE"":""DYNAMIC"",""GLOBAL_BUFFER_COUNT"":4096,""LOCK_SPACE"":400,""MUTEX_SLOTS"":1024,""RESERVED_BYTES"":0,""WINDOW_SIZE"":""""},""ASDF"":{""NAME"":""ASDF"",""FILE_NAME"":"""",""ACCESS_METHOD"":""BG"",""ALLOCATION"":100,""ASYNCIO"":false,""BLOCK_SIZE"":1024,""DEFER_ALLOCATE"":true,""ENCRYPTION_FLAG"":false,""EXTENSION_COUNT"":100,""GLOBAL_BUFFER_COUNT"":1024,""LOCK_SPACE"":40,""MUTEX_SLOTS"":1024,""RESERVED_BYTES"":0}}}"
 	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from no file name for segment")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from no file name for segment")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from no file name for segment")
 	d ASSERT("%GDE-E-QUALREQD, File required",$g(JSON("errors",1)),"Receved an unexpected error from no file name for segment")
@@ -293,7 +293,7 @@ save	;; @TEST save web service
 	s BODY=""
 	s RESULT=$$save^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT("",$g(RESULT),"Incorrect Response from Null Body")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(400,$g(HTTPERR),"Incorrect Response from Null Body")
 	d ASSERT(400,$g(^TMP("HTTPERR",$J,1,"error","code")),"Error code not set from Null Body")
 	d ASSERT(301,$g(^TMP("HTTPERR",$J,1,"error","errors",1,"reason")),"Reason code not set from Null Body")
@@ -306,7 +306,7 @@ save	;; @TEST save web service
 	; d ASSERT("",$g(RESULT),"Incorrect Response from Null Body")
 	; d ASSERT(400,$g(HTTPERR),"Incorrect Response from Invalid JSON")
 	; d ASSERT(400,$g(^TMP("HTTPERR",$J,1,"error","code")),"Error code not set from Invalid JSON")
-	; d ASSERT(200,$g(^TMP("HTTPERR",$J,1,"error","errors",1,"reason")),"Reason code not set from Invalid JSON")
+	; d ASSERT(202,$g(^TMP("HTTPERR",$J,1,"error","errors",1,"reason")),"Reason code not set from Invalid JSON")
 	; d ASSERT(0,$d(^TMP("HTTPERR",$J,1,"error","errors",2,"reason")),"Too many errors set from Invalid JSON")
 	;
 	; Name with region (Valid)
@@ -314,7 +314,7 @@ save	;; @TEST save web service
 	s BODY(1)="{""names"":{""ZZYOTTADB"":""TEMP""}}"
 	s RESULT=$$save^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name response")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name")
 	d ASSERT(0,$d(JSON("errors")),"Receved an unexpected error from Valid Name")
@@ -324,7 +324,7 @@ save	;; @TEST save web service
 	k ARGS,RESULT,ERR,HTTPERR,JSON,^TMP("HTTPERR",$J)
 	d get^GDEWEB(.RESULT,.ARGS)
 	d ASSERT(10,$d(RESULT),"Incorrect Response from Valid Name verification")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name verification response")
 	d ASSERT("ZZYOTTADB",$g(JSON("map",13,"from")),"Unable to find added name from Valid Name verification")
 	d ASSERT("TEMP",$g(JSON("map",13,"region")),"Unable to find added name from Valid Name verification")
@@ -335,7 +335,7 @@ save	;; @TEST save web service
 	s BODY="{""names"":{""ZZYOTTADB2(1:3)"":""TEMP""}}"
 	s RESULT=$$save^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name Range")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name Range response")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name Range")
 	d ASSERT(0,$d(JSON("errors")),"Receved an unexpected error from Valid Name Range")
@@ -345,7 +345,7 @@ save	;; @TEST save web service
 	k ARGS,RESULT,ERR,HTTPERR,JSON,^TMP("HTTPERR",$J)
 	d get^GDEWEB(.RESULT,.ARGS)
 	d ASSERT(10,$d(RESULT),"Incorrect Response from Valid Name Range verification")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name Range verification response")
 	d ASSERT("ZZYOTTADB2(1)",$g(JSON("map",15,"from")),"Unable to find added name from Valid Name Range verification")
 	d ASSERT("ZZYOTTADB2(3)",$g(JSON("map",15,"to")),"Unable to find added name from Valid Name Range verification")
@@ -357,7 +357,7 @@ save	;; @TEST save web service
 	s BODY="{""names"":{""ZZYOTTADB1"":""ZZYOTTADB""},""regions"":{""ZZYOTTADB"":{""DYNAMIC_SEGMENT"":""ZZYOTTADB""}},""segments"":{""ZZYOTTADB"":{""FILE_NAME"":""/tmp/zzyottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
 	s RESULT=$$save^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name, Valid Segment, Valid Region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name, Valid Segment, Valid Region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name, Valid Segment, Valid Region")
 	d ASSERT(0,$d(JSON("errors",1)),"Receved too many errors from Valid Name, Valid Segment, Valid Region")
@@ -367,7 +367,7 @@ save	;; @TEST save web service
 	k ARGS,RESULT,ERR,HTTPERR,JSON,^TMP("HTTPERR",$J)
 	d get^GDEWEB(.RESULT,.ARGS)
 	d ASSERT(10,$d(RESULT),"Incorrect Response from Valid Name verification")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name verification response")
 	d ASSERT("ZZYOTTADB1",$g(JSON("map",15,"from")),"Unable to find added name from Valid Name, Valid Segment, Valid Region verification")
 	d ASSERT("ZZYOTTADB",$g(JSON("map",15,"region")),"Unable to find added name from Valid Name, Valid Segment, Valid Region verification")
@@ -387,7 +387,7 @@ delete	;; @TEST delete web service
 	s BODY=""
 	s RESULT=$$delete^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT("",$g(RESULT),"Incorrect Response from Null Body")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(400,$g(HTTPERR),"Incorrect Response from Null Body")
 	d ASSERT(400,$g(^TMP("HTTPERR",$J,1,"error","code")),"Error code not set from Null Body")
 	d ASSERT(301,$g(^TMP("HTTPERR",$J,1,"error","errors",1,"reason")),"Reason code not set from Null Body")
@@ -400,7 +400,7 @@ delete	;; @TEST delete web service
 	; d ASSERT("",$g(RESULT),"Incorrect Response from Null Body")
 	; d ASSERT(400,$g(HTTPERR),"Incorrect Response from Invalid JSON")
 	; d ASSERT(400,$g(^TMP("HTTPERR",$J,1,"error","code")),"Error code not set from Invalid JSON")
-	; d ASSERT(200,$g(^TMP("HTTPERR",$J,1,"error","errors",1,"reason")),"Reason code not set from Invalid JSON")
+	; d ASSERT(202,$g(^TMP("HTTPERR",$J,1,"error","errors",1,"reason")),"Reason code not set from Invalid JSON")
 	; d ASSERT(0,$d(^TMP("HTTPERR",$J,1,"error","errors",2,"reason")),"Too many errors set from Invalid JSON")
 	;
 	; Name with region (Valid)
@@ -408,7 +408,7 @@ delete	;; @TEST delete web service
 	s BODY(1)="{""name"":{""NAME"":""ZZYOTTADB""}}"
 	s RESULT=$$delete^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name response")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name")
 	d ASSERT(0,$d(JSON("errors")),"Receved an unexpected error from Valid Name")
@@ -418,7 +418,7 @@ delete	;; @TEST delete web service
 	k ARGS,RESULT,ERR,HTTPERR,JSON,^TMP("HTTPERR",$J)
 	d get^GDEWEB(.RESULT,.ARGS)
 	d ASSERT(10,$d(RESULT),"Incorrect Response from Valid Name verification")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name verification response")
 	d ASSERT("",$g(JSON("names","ZZYOTTADB")),"Unable to find added name from Valid Name verification")
 	;
@@ -427,7 +427,7 @@ delete	;; @TEST delete web service
 	s BODY="{""name"":{""NAME"":""ZZYOTTADB2(1:3)""}}"
 	s RESULT=$$delete^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name Range")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name Range response")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name Range")
 	d ASSERT(0,$d(JSON("errors")),"Receved an unexpected error from Valid Name Range")
@@ -437,7 +437,7 @@ delete	;; @TEST delete web service
 	k ARGS,RESULT,ERR,HTTPERR,JSON,^TMP("HTTPERR",$J)
 	d get^GDEWEB(.RESULT,.ARGS)
 	d ASSERT(10,$d(RESULT),"Incorrect Response from Valid Name Range verification")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name Range verification response")
 	d ASSERT("",$g(JSON("names","ZZYOTTADB2(1:3)")),"Unable to find added name from Valid Name Range verification")
 	;
@@ -446,7 +446,7 @@ delete	;; @TEST delete web service
 	s BODY="{""name"":{""NAME"":""ZZYOTTADB1""},""region"":{""REGION"":""ZZYOTTADB""},""segment"":{""SEGMENT"":""ZZYOTTADB""}}"
 	s RESULT=$$delete^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Valid Name, Valid Segment, Valid Region")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name, Valid Segment, Valid Region")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Valid Name, Valid Segment, Valid Region")
 	d ASSERT(0,$d(JSON("errors",1)),"Receved too many errors from Valid Name, Valid Segment, Valid Region")
@@ -456,7 +456,7 @@ delete	;; @TEST delete web service
 	k ARGS,RESULT,ERR,HTTPERR,JSON,^TMP("HTTPERR",$J)
 	d get^GDEWEB(.RESULT,.ARGS)
 	d ASSERT(10,$d(RESULT),"Incorrect Response from Valid Name verification")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name verification response")
 	d ASSERT("",$g(JSON("names","ZZYOTTADB1")),"Unable to find added name from Valid Name, Valid Segment, Valid Region verification")
 	d ASSERT(0,$d(JSON("regions","ZZYOTTADB")),"Unable to find added region from Valid Name, Valid Segment, Valid Region verification")
@@ -467,7 +467,7 @@ delete	;; @TEST delete web service
 	s BODY(1)="{""name"":{""NAME"":""ASDF""}}"
 	s RESULT=$$delete^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Invalid Name")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Invalid Name response")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Invalid Name")
 	d ASSERT(10,$d(JSON("errors")),"Receved an unexpected error from Invalid Name")
@@ -478,7 +478,7 @@ delete	;; @TEST delete web service
 	s BODY(1)="{""name"":{""NAME"":""#""}}"
 	s RESULT=$$delete^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Delete Local Locks Name")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Delete Local Locks Name response")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Delete Local Locks Name")
 	d ASSERT(10,$d(JSON("errors")),"Receved an unexpected error from Delete Local Locks Name")
@@ -496,7 +496,7 @@ delete	;; @TEST delete web service
 	s BODY(1)="[{""region"":{""REGION"":""YOTTADB""}},{""segment"":{""SEGMENT"":""YDB""}},{""name"":{""NAME"":""YDB""}}]"
 	s RESULT=$$delete^GDEWEB(.ARGS,.BODY,.RESULT)
 	d ASSERT(11,$d(RESULT),"Incorrect Response from Delete Array")
-	d:$d(RESULT) DECODE^VPRJSON("RESULT","JSON","ERR")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Delete Array response")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from Delete Array")
 	d ASSERT(0,$d(JSON("errors")),"Receved an unexpected error from Delete Array")

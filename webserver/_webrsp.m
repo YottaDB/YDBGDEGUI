@@ -9,6 +9,7 @@ RESPOND ; find entry point to handle request and call it
  K:'$G(NOGBL) ^TMP($J)
  N ROUTINE,LOCATION,HTTPARGS,HTTPBODY,PARAMS,AUTHNODE
  I HTTPREQ("path")="/",HTTPREQ("method")="GET" D en^%webhome(.HTTPRSP) QUIT  ; Home page requested.
+ I HTTPREQ("method")="OPTIONS" S HTTPRSP="OPTIONS,POST" QUIT ; Always repond to OPTIONS to give CORS header info
  ;
  ; Resolve the URL and authenticate if necessary
  D MATCH(.ROUTINE,.HTTPARGS,.PARAMS,.AUTHNODE)
@@ -261,6 +262,12 @@ SENDATA ; write out the data as an HTTP response
  . D W("Content-Type: "_HTTPRSP("mime")_$C(13,10)) K HTTPRSP("mime") ; Mime-type
  E  D W("Content-Type: application/json; charset=utf-8"_$C(13,10))
  ;
+ ; Add CORS Header
+ I $G(HTTPREQ("method"))="OPTIONS" D W("Access-Control-Allow-Methods: OPTIONS, POST"_$C(13,10))
+ I $G(HTTPREQ("method"))="OPTIONS" D W("Access-Control-Allow-Headers: Content-Type"_$C(13,10))
+ I $G(HTTPREQ("method"))="OPTIONS" D W("Access-Control-Max-Age: 86400"_$C(13,10))
+ D W("Access-Control-Allow-Origin: *"_$C(13,10))
+ ;
  I $P($SY,",")=47,$G(HTTPREQ("header","accept-encoding"))["gzip" GOTO GZIP  ; If on GT.M, and we can zip, let's do that!
  ;
  D W("Content-Length: "_SIZE_$C(13,10)_$C(13,10))
@@ -379,8 +386,12 @@ XML(RESULT,ARGS) ; text XML
  QUIT
  ;
 URLMAP ; map URLs to entry points (HTTP methods handled within entry point)
- ;;GET ping PING^%webrsp
- ;;GET xml XML^%webrsp
+ ;;GET get get^GDEWEB
+ ;;POST verify verify^GDEWEB
+ ;;POST save save^GDEWEB
+ ;;POST add add^GDEWEB
+ ;;POST delete delete^GDEWEB
+
  ;;zzzzz
  ;
 AUTHEN(HTTPAUTH) ; Authenticate User against VISTA from HTTP Authorization Header
