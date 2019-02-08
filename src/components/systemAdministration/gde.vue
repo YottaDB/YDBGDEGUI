@@ -1299,8 +1299,6 @@ export default {
       Object.keys(self.names).forEach((name) => {
         if (name === '#') {
           self.displayName = 'Local Locks';
-        } else if (name === '*') {
-          self.displayName = 'Default';
         } else {
           self.displayName = name;
         }
