@@ -22,7 +22,7 @@ source /opt/yottadb/gui/env
 
 # Start the GUI
 cd /opt/yottadb/gui/dist
-/opt/yottadb/current/mumps -run ^GDEWEB 8080
+/opt/yottadb/current/mumps -run ^GDEWEB 8080 SSL
 
 rm -f ~/fifo
 mkfifo ~/fifo || exit

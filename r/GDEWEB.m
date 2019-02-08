@@ -13,16 +13,42 @@
 ; Starts the HTTP(S) server to serve the GUI files and web services
 ;
 ; @param {Integer} portnum - The TCP Port number to start the web server on
+; @param {Integer} ssl - Enable/disable SSL
 ;
 ; @example
 ; d WEB^GDEWEB(9080)
 ;
-WEB(portnum)
-	i $l($zcmdline)&($zcmdline=+$zcmdline) s portnum=$zcmdline
+WEB(portnum,ssl)
+	; parse arguments
+	n done,args,i
+	s done=0
+	f i=1:1:$l($zcmdline," ") d
+	. s args(i)=$p($zcmdline," ",i)
+	i $l($g(args(1)))&($g(args(1))=+$g(args(1))) s portnum=args(1)
+	e  s portnum=""
+	i $l($g(args(2))) s ssl=args(2)
+	;
+	; Get the port number to run on
 	i '$l(portnum)  w "No port number specified, or invalid - using default of 8080",!
-	d:$l($t(^%webreq)) job^%webreq($g(portnum,8080),"ydbgui")
-	w:'$l($t(^%webreq)) "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
-	q
+	;
+	; If we have no ssl flag quit (explicit configuration of SSl/TLS vs plain text)
+	i $g(ssl)="" w "SSL/TLS is not explicitly disabled or enabled. You must explicitly configure this!",!,"Quitting...",! quit
+	;
+	; Determine if we need to run in SSL/TLS mode
+	i ((ssl="ssl")!(ssl="SSL")!(ssl=1)) s ssl=1
+	i ((ssl)&('$l($ztrnlnm("ydb_tls_passwd_ydbgui")))) w "SSL/TLS configuration not found!",! quit
+	;
+	; See if we are asked to be in non-SSL/TLS mode
+	i ((ssl="nossl")!(ssl="NOSSL")!(ssl=0)) s ssl=0 w "SSL configuration NOT found!",!
+	i 'ssl w "WARNING: Web server started without SSL/TLS",!
+	;
+	; Start the web server
+	i $l($t(^%webreq)) d
+	. w "Starting Web Server...",!
+	. d job^%webreq($g(portnum,8080),$s(ssl:"ydbgui",1:""))
+	e  d
+	. w "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
+	quit
 ;
 ; Stops the HTTP(S) server that serves the GUI files and web services
 ;
@@ -36,7 +62,7 @@ STOP
 	f  s pid=$o(KBBO("JOBS",pid)) q:pid=""  d
 	. zsy "kill "_pid
 	. k KBBO("JOBS",pid)
-	q
+	quit
 ;
 ; Get the global directory as a JSON object
 ;
@@ -45,7 +71,7 @@ STOP
 ;
 ; @example
 ; d get^GDEWEB(.RESULT,.ARGS)
-; 
+;
 get(RESULT,ARGS)
 	n JSON,ERR,gdequiet,gdeweberror,gdewebquit
 	n useio,io
@@ -191,7 +217,7 @@ delete(ARGS,BODY,RESULT)
 ;
 ; @example
 ; d deleteone^GDEWEB("{""name"":{""NAME"":""XTMP""}")
-; 
+;
 deleteone(JSON)
 	i $d(JSON("name")) d
 	. i $g(JSON("name","NAME"))="#" s gdeweberror($i(gdeweberror("count")))="Can't delete 'Local Locks' name" q
@@ -316,7 +342,7 @@ save(ARGS,BODY,RESULT)
 ; @example
 ; s BODY="{""names"":{""ZZTEST"":""TEMP""}}"
 ; s STATUS=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
-; 
+;
 verify(ARGS,BODY,RESULT)
 	n JSON,ERR,gdequiet,gdeweberror,gdewebquit
 	n useio,io
@@ -452,7 +478,7 @@ verify(ARGS,BODY,RESULT)
 ; Performs all of the required setup to execute global directory editor internal commands.
 ; Also sets up various error traps, etc.
 ;
-; 
+;
 setup
 	n debug
 	s debug=""
@@ -499,7 +525,7 @@ setup
 ; This calculates the display names. It is copied from GDESHOW and modified to move results to map2
 ;
 ; @input map - Global Directory map information
-; 
+;
 mapdispcalc:
 	n coll,gblname,isplusplus,m,mapdisplen,mlen,mprev,mtmp,name,namedisp,namelen,offset
 	s m=""
@@ -516,7 +542,7 @@ mapdispcalc:
 	. s namedisp=$$namedisp(name,0)
 	. s mapdisp(m)=namedisp,mapdisplen=$zwidth(namedisp)
 	. i mapdispmaxlen<mapdisplen s mapdispmaxlen=mapdisplen
-	q
+	quit
 ;
 ; Convert passed name to a name that is displayable (i.e. if it contains control characters, they are replaced by $c() etc.)
 ; (called from mapdispcalc and onemap)
@@ -525,7 +551,7 @@ mapdispcalc:
 ; @param {Integer} addquote - 0 = no surrounding double-quotes are added. 1 = when control characters are seen (e.g. $c(...)) return
 ;                                 the name with double-quotes
 ; @returns {String} - Display name of passed name
-; 
+;
 namedisp:(name,addquote)
 	; returns a
 	n namezwrlen,namezwr,namedisplen,namedisp,ch,quotestate,starti,i,seenquotestate3,doublequote
@@ -567,30 +593,30 @@ namedisp:(name,addquote)
 ; @param {Array} s1 - Start of range
 ; @param {Array/Object} s2 - End of range
 ; @output {Array} map2 - Global Directory map data in displyable format
-; 
+;
 onemap:(s1,s2)
-	i $l(mapreg),mapreg'=map(s2) q
+	i $l(mapreg),mapreg'=map(s2) quit
 	s l1=$zl(s1)
-	i $zl(s2)=l1,$ze(s1,l1)=0,$ze(s2,l1)=")",$ze(s1,1,l1-1)=$ze(s2,1,l1-1) q
+	i $zl(s2)=l1,$ze(s1,l1)=0,$ze(s2,l1)=")",$ze(s1,1,l1-1)=$ze(s2,1,l1-1) quit
 	i '$d(mapdisp(s1)) s mapdisp(s1)=s1 ; e.g. "..." or "LOCAL LOCKS"
 	i '$d(mapdisp(s2)) s mapdisp(s2)=s2 ; e.g. "..." or "LOCAL LOCKS"
 	s map2(index,"from")=mapdisp(s2)
 	s map2(index,"to")=mapdisp(s1)
 	s map2(index,"region")=map(s2)
-	i '$d(regs(map(s2),"DYNAMIC_SEGMENT")) d  q
+	i '$d(regs(map(s2),"DYNAMIC_SEGMENT")) d  quit
 	. s map2(index,"segment")="NONE"
 	. s map2(index,"file")="NONE"
 	s j=regs(map(s2),"DYNAMIC_SEGMENT") s map2(index,"segment")=j
 	i '$d(segs(j,"ACCESS_METHOD")) s map2(index,"file")="NONE"
 	e  s s=segs(j,"FILE_NAME") s map2(index,"file")=$$namedisp(s,1)
-	q
+	quit
 ;
 ; Convert a given name string into a parsed array that contains all of the data needed to work with other GDE APIs
 ; This is copied from tokscan^GDESCAN and modified to be silent and work with passed data
 ;
 ; @param {Array} name - name to convert
 ; @output {Array} NAME - Parsed name in format understandable by other GDE APIs
-; 
+;
 createnamearray(name)
 	n i,c,NAMEsubs,NAMEtype,cp,ntoken
 	s cp=1
@@ -700,4 +726,4 @@ createnamearray(name)
 	. s coll=+$g(gblname,"COLLATION")
 	. s key=$$gvn2gds^GDEMAP("^"_NAME,coll)
 	. d keylencheck^GDEPARSE(NAME,key,coll)
-	q
+	quit
