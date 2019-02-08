@@ -994,6 +994,11 @@ export default {
       version: [],
       fromSave: false,
       deletedItems: [],
+      unsavedItems: {
+        names: [],
+        regions: [],
+        segments: [],
+      },
       saved: true,
       advanced: false,
       items: [],
@@ -1384,13 +1389,16 @@ export default {
       // Move data from the modal to the correct object behind the scenes
       switch (type) {
         case 'name':
-          this.names[self.selectedItem.name.NAME] = self.selectedItem.name.REGION;
+          self.names[self.selectedItem.name.NAME] = self.selectedItem.name.REGION;
+          self.unsavedItems.names.push(self.selectedItem.name.NAME);
           break;
         case 'segment':
-          this.segments[self.selectedItem.segment.NAME] = self.selectedItem.segment;
+          self.segments[self.selectedItem.segment.NAME] = self.selectedItem.segment;
+          self.unsavedItems.segments.push(self.selectedItem.segment.NAME);
           break;
         case 'region':
-          this.regions[self.selectedItem.region.NAME] = self.selectedItem.region;
+          self.regions[self.selectedItem.region.NAME] = self.selectedItem.region;
+          self.unsavedItems.regions.push(self.selectedItem.region.NAME);
           break;
         default:
           break;
@@ -1414,34 +1422,50 @@ export default {
     remove(item, type) {
       const self = this;
       let index = 0;
+      let unsavedItemsIndex = 0;
       self.saved = false;
       switch (type) {
         case 'name':
-          self.deletedItems.push({
-            name: {
-              NAME: item.name,
-            },
-          });
+          unsavedItemsIndex = self.unsavedItems.names.findIndex(name => name === item.name);
+          if (unsavedItemsIndex === -1) {
+            self.deletedItems.push({
+              name: {
+                NAME: item.name,
+              },
+            });
+          } else {
+            self.unsavedItems.names.splice(unsavedItemsIndex, 1);
+          }
           delete self.names[item.name];
           index = self.items.findIndex(name => name.name === item.name);
           self.items.splice(index, 1);
           break;
         case 'segment':
-          self.deletedItems.push({
-            segment: {
-              SEGMENT: item.name,
-            },
-          });
+          unsavedItemsIndex = self.unsavedItems.segments.findIndex(segment => segment === item.name);
+          if (unsavedItemsIndex === -1) {
+            self.deletedItems.push({
+              segment: {
+                SEGMENT: item.name,
+              },
+            });
+          } else {
+            self.unsavedItems.segments.splice(unsavedItemsIndex, 1);
+          }
           delete self.segments[item.name];
           index = self.segmentItems.findIndex(segment => segment.name === item.name);
           self.segmentItems.splice(index, 1);
           break;
         case 'region':
-          self.deletedItems.push({
-            region: {
-              REGION: item.name,
-            },
-          });
+          unsavedItemsIndex = self.unsavedItems.regions.findIndex(region => region === item.name);
+          if (unsavedItemsIndex === -1) {
+            self.deletedItems.push({
+              region: {
+                REGION: item.name,
+              },
+            });
+          } else {
+            self.unsavedItems.regions.splice(unsavedItemsIndex, 1);
+          }
           delete self.regions[item.name];
           index = self.regionItems.findIndex(region => region.name === item.name);
           self.regionItems.splice(index, 1);
@@ -1458,7 +1482,7 @@ export default {
         data: self.deletedItems,
       }).then((result) => {
         if (result.data.verifyStatus) {
-          self.deleteItems = [];
+          self.deletedItems = [];
         } else {
           self.errors = JSON.stringify(result.data);
           self.$refs.modalError.show();
@@ -1549,6 +1573,11 @@ export default {
           self.modified = false;
           self.saved = true;
           self.fromSave = false;
+          self.unsavedItems = {
+            names: [],
+            regions: [],
+            segments: [],
+          };
           return Promise.resolve(true);
         }
         self.fromSave = false;
