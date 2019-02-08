@@ -52,7 +52,9 @@
           <template slot="actions" slot-scope="row">
             <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
             <b-btn v-b-modal.modalEditName @click="info(row.item)">Edit</b-btn>
-            <b-btn variant="danger" @click="remove(row.item,'name')">Delete</b-btn>
+            <b-btn v-if="show(row.item)"
+                   variant="danger"
+                   @click="remove(row.item,'name')">Delete</b-btn>
             <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
             <b-button @click.stop="row.toggleDetails" class="mr-2">
              {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
@@ -1169,6 +1171,16 @@ export default {
   methods: {
     forceUpper(e, obj, prop) {
       this.$set(obj, prop, e.toUpperCase());
+    },
+    show(item) {
+      switch (item.name) {
+        case '*':
+          return false;
+        case '#': // Also known as Local Locks
+          return false;
+        default:
+          return true;
+      }
     },
     info(item) {
       const self = this;
