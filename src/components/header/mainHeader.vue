@@ -12,35 +12,55 @@
 #################################################################
 -->
 <template>
-<header id="header">
-  <b-container id="main-header">
-    <b-row id="navholder">
-    <b-navbar toggleable id="main-nav">
-      <b-navbar-brand href="/" id="main-logo">
-        <img src="../../assets/img/YottaDB_logo.svg" alt="YottaDB">
-      </b-navbar-brand>
-      <b-nav-toggle target="nav_collapse"></b-nav-toggle>
-      <b-collapse is-nav id="nav_collapse">
-        <ul id="menu-main-menu" class="menu">
-          <li v-for="menu in menus.main" :key="menu.name" class="menu-item menu-item-has-children">
-            <router-link :to="menu.url" v-text="menu.name"></router-link>
-            <ul class="sub-menu">
-              <li v-for="submenu in menu.submenus" :key="submenu.name" class="menu-item">
-                <router-link :to="submenu.url" v-text="submenu.name"></router-link>
+  <header id="header">
+    <b-container id="main-header">
+      <b-row id="navholder">
+        <b-navbar
+          id="main-nav"
+          toggleable>
+          <b-navbar-brand
+            id="main-logo"
+            href="/">
+            <img
+              src="../../assets/img/YottaDB_logo.svg"
+              alt="YottaDB">
+          </b-navbar-brand>
+          <b-nav-toggle target="nav_collapse"/>
+          <b-collapse
+            id="nav_collapse"
+            is-nav>
+            <ul
+              id="menu-main-menu"
+              class="menu">
+              <li
+                v-for="menu in menus.main"
+                :key="menu.name"
+                class="menu-item menu-item-has-children">
+                <router-link
+                  :to="menu.url"
+                  v-text="menu.name"/>
+                <ul class="sub-menu">
+                  <li
+                    v-for="submenu in menu.submenus"
+                    :key="submenu.name"
+                    class="menu-item">
+                    <router-link
+                      :to="submenu.url"
+                      v-text="submenu.name"/>
+                  </li>
+                </ul>
               </li>
             </ul>
-          </li>
-        </ul>
-      </b-collapse>
-    </b-navbar>
-  </b-row>
-  </b-container>
-</header>
+          </b-collapse>
+        </b-navbar>
+      </b-row>
+    </b-container>
+  </header>
 </template>
 
 <script>
 export default {
-  name: 'mainHeader',
+  name: 'MainHeader',
   data() {
     return {
       menus: {

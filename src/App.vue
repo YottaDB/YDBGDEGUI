@@ -12,13 +12,13 @@
 #################################################################
 -->
 <template>
-<div id="main_wrapper">
-  <mainHeader></mainHeader>
-  <main class="main">
-    <router-view/>
-  </main>
-<!--   <mainFooter></mainFooter> -->
-</div>
+  <div id="main_wrapper">
+    <mainHeader/>
+    <main class="main">
+      <router-view/>
+    </main>
+    <!--   <mainFooter></mainFooter> -->
+  </div>
 </template>
 
 <script>

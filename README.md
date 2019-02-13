@@ -31,7 +31,37 @@ Installing the HTML,CSS, and Javascript requires extracting to a path of your li
 To start the webserver:
 
 ```bash
-$ydb_dist/mumps -run ^GDEWEB 8080
+# Install dependencies and build
+npm install
+npm run build
+
+# Compile M programs
+
+# Web server
+mkdir webserver/o
+cd webserver/o
+# ignore any compiler errors here as the webserver supports multiple M implementations
+$ydb_dist/mumps ../*.m >/dev/null 2>&1
+cd ..
+
+# M-Unit
+mkdir munit/o
+cd munit/o
+# ignore any compiler errors here as the webserver supports multiple M implementations
+$ydb_dist/mumps ../*.m >/dev/null 2>&1
+cd ..
+
+# GDE GUI
+mkdir o
+cd /opt/yottadb/gui/o
+# Compiler errors are not ignored here as any errors are important
+$ydb_dist/mumps ../r/*.m
+
+# Start the webserver
+#
+# Subsitutue NOSSL with SSL if you have setup the necessary SSL setup
+cd dist
+$ydb_dist/mumps -run ^GDEWEB 8080 NOSSL
 ```
 
 8080 is the port number in which to start the web server and can be adjusted to any port number that is available on your system.
@@ -42,7 +72,7 @@ The YottaDB Global Directory GUI is built using `vue.js <https://vuejs.org/>`_. 
 
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
 npm install
 

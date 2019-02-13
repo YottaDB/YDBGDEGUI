@@ -24,7 +24,9 @@ source /opt/yottadb/gui/env
 cd /opt/yottadb/gui/dist
 /opt/yottadb/current/mumps -run ^GDEWEB 8080 SSL
 
-rm -f ~/fifo
-mkfifo ~/fifo || exit
-chmod 400 ~/fifo
-read < ~/fifo
+# Webserver doesn't daemonize, use a fifo to allow bash to capture
+# signals from docker
+rm -f /tmp/gdeweb-fifo
+mkfifo /tmp/gdeweb-fifo || exit
+chmod 400 /tmp/gdeweb-fifo
+read < /tmp/gdeweb-fifo
