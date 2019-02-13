@@ -1,0 +1,59 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+stages:
+ - build
+ - test
+ - push
+
+build:
+  artifacts:
+    paths:
+      - docker-images
+  stage: build
+  script:
+    - mkdir docker-images
+    - docker build --pull -t yottadb/yottadbgui:latest -f Dockerfile .
+    - docker save yottadb/yottadbgui:latest > docker-images/app.tar
+
+munit:
+  stage: test
+  script:
+    - docker load -i docker-images/app.tar
+    - docker run -itd -p 8080:8080 --name ydbgui yottadb/yottadbgui:latest
+    - sleep 10
+    - docker exec -t ydbgui bash -c 'source ./env && mumps -run ^GDEWEBT'
+
+artifact:
+  stage: push
+  artifacts:
+    paths:
+      - gui
+      - r
+  script:
+    - docker load -i docker-images/app.tar
+    - docker run -itd -p 8080:8080 --name ydbgui yottadb/yottadbgui:latest
+    - docker cp ydbgui:/opt/yottadb/gui/dist ./gui
+    - docker cp ydbgui:/opt/yottadb/gui/r/ .
+    - rm -f gui/*.mj*
+
+push:
+  stage: push
+  script:
+    - docker login -u $HUB_USERNAME -p $HUB_PASSWORD
+    - docker load -i docker-images/app.tar
+    - docker tag yottadb/yottadbgui:latest yottadb/yottadbgui:latest-master
+    - docker push yottadb/yottadbgui:latest-master
+  only:
+    - master@YottaDB/UI/YDBGDEGUI
+
+push-release:
+  stage: push
+  script:
+    - docker login -u $HUB_USERNAME -p $HUB_PASSWORD
+    - docker load -i docker-images/app.tar
+    - docker push yottadb/yottadbgui:latest
+  only:
+    - tag

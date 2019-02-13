@@ -1,18 +1,98 @@
-# YottaDBGUI
-Repository for all GUI apps developed by YottaDB. At present, it only contains a proof-of-concept prototype for a GDE GUI.
+# YottaDB Global Directory GUI
 
-Instructions for launching the GDE GUI:
-1. Run YottaDB once in direct mode to ensure that the database is present, then halt.
-2. Either copy the routines from this repository's r/ directory to a directory listed in $gtmroutines, such as $gtmdir/$gtmver/r or adjust $gtmroutines so that the routines are executed ahead of any routines in $ydb_dist. You must do this with the environment variable; setting $zroutines inside a process does not pass any changes in $zroutines to JOB'd processes.
-3. Set ^%WHOME to the full path of the web/www directory from the repository, ending with web/www/. While this proof of concept uses global variables, the production version will not. In addition to ^%WHOME, this program also uses ^VPRHTTP.
-5. From direct mode, run DO WEB^GDE(portnum); e.g., DO WEB^GDE(8080)
-  * If the routines are being compiled, compilation errors from code intended for other MUMPS implementations is expected. This will not be the case for the production version.
-  * Click on the dot next to a node to bring up a menu for that item. At present, the menu items only pertain to connectivity and node existence. In the production version, you will be able to edit other properties.
-  * Saving re-orders the graph.
-6. In the browser, connect to localhost:portnum (e.g. localhost:8080) to load the GUI. Use the mouse scrolling function to zoom in and out. Click and drag inside the graph and outside the nodes to move the graph.
-  * The computer should be connected to the internet for the prototype GUI to run, as the prototype gets jQuery and other libraries from cloud-based services. 
-  * File nodes do not display popup boxes when clicked.
-7. To shut down the server, kill the mumps server process; currently, this is the only way to stop the server.
-8. To restart the server, run DO WEB^GDE(portnum) from direct mode.
+The YottaDB Global Directory GUI is a browser based application that can be used to manage Global Directories for YottaDB. The GUI is designed to a quick way to perform edits to Global Directory files, visualize Global Mappings and manage the database files used to store Globals.
 
-Note that this is just a proof-of-concept prototype, and not intended for use other than to evaluate user-interface models.
+# Installation
+
+## Docker Container
+
+A docker container is available on docker hub as `yottadb/yottadbgui` which contains the latest version of the GUI pre-built in production mode. It is primarily designed for demo purposes, future versions may allow for more functionality.
+
+There is only one exposed port `8080` which all webservices and the GUI itself runs on. In the command below it is port forwarded to port `8089`, you can change this on your own local system if there are conflicts or if you want the GUI on a different port.
+
+``` bash
+docker build -t yottadb/yottadbgui:latest .
+docker run -itd -p 8089:8080 --name ydbgui yottadb/yottadbgui:latest
+```
+
+To use the GUI go to https://localhost:8089 in a web browser.
+
+## Manual Setup
+
+The GUI has two parts:
+
+1. MUMPS based routines that provide the web services and web server
+2. HTML, CSS, and JavaScript that provide the actual GUI interface
+
+Installing the routines involves copying the contents of the `r` directory to a path contained within your `ydb_routines` search path. You can also add a new directory to your `ydb_routines` search path.
+
+Installing the HTML,CSS, and Javascript requires extracting to a path of your liking and starting the webserver from that path as the webserver looks for all of the required files in the current working directory
+
+To start the webserver:
+
+```bash
+# Install dependencies and build
+npm install
+npm run build
+
+# Compile M programs
+
+# Web server
+mkdir webserver/o
+cd webserver/o
+# ignore any compiler errors here as the webserver supports multiple M implementations
+$ydb_dist/mumps ../*.m >/dev/null 2>&1
+cd ..
+
+# M-Unit
+mkdir munit/o
+cd munit/o
+# ignore any compiler errors here as the webserver supports multiple M implementations
+$ydb_dist/mumps ../*.m >/dev/null 2>&1
+cd ..
+
+# GDE GUI
+mkdir o
+cd /opt/yottadb/gui/o
+# Compiler errors are not ignored here as any errors are important
+$ydb_dist/mumps ../r/*.m
+
+# Start the webserver
+#
+# Subsitutue NOSSL with SSL if you have setup the necessary SSL setup
+cd dist
+$ydb_dist/mumps -run ^GDEWEB 8080 NOSSL
+```
+
+8080 is the port number in which to start the web server and can be adjusted to any port number that is available on your system.
+
+# Development
+
+The YottaDB Global Directory GUI is built using `vue.js <https://vuejs.org/>`_. It uses `webpack <https://webpack.js.org/>`_ to build the application for both development and production targets.
+
+## Build Setup
+
+```bash
+# install dependencies
+npm install
+
+# serve with hot reload at localhost:8080
+npm run dev
+
+# build for production with minification
+npm run build
+
+# build for production and view the bundle analyzer report
+npm run build --report
+
+# run unit tests
+npm run unit
+
+# run e2e tests
+npm run e2e
+
+# run all tests
+npm test
+```
+
+For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
