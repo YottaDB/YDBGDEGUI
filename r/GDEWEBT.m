@@ -115,10 +115,8 @@ verify	;; @TEST Verify web service
 	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from segment with required attribute - no region, no access method")
 	d ASSERT("",$g(HTTPERR),"Incorrect Response from segment with required attribute - no region, no access method")
-	d ASSERT("%GDE-I-QUALREQD, Access method required",$g(JSON("errors",1)),"Receved an unexpected error from segment with required attribute - no region, no access method")
-	d ASSERT("%GDE-I-SEGIS, in  segment YOTTADB",$g(JSON("errors",2)),"Receved an unexpected error from segment with required attribute - no region, no access method")
-	d ASSERT("%GDE-I-MAPBAD, A REGION for SEGMENT YOTTADB does not exist",$g(JSON("errors",3)),"Receved an unexpected error from segment with required attribute - no region, no access method")
-	d ASSERT(0,$d(JSON("errors",4)),"Receved too many errors from segment with required attribute - no region, no access method")
+	d ASSERT("%GDE-E-QUALREQD, Access method required",$g(JSON("errors",1)),"Receved an unexpected error from segment with required attribute - no region, no access method")
+	d ASSERT(0,$d(JSON("errors",2)),"Receved too many errors from segment with required attribute - no region, no access method")
 	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from segment with required attribute - no region, no access method")
 	;
 	; Segment with 2 required attribute, no region
@@ -281,6 +279,18 @@ verify	;; @TEST Verify web service
 	d ASSERT("%GDE-E-QUALREQD, File required",$g(JSON("errors",1)),"Receved an unexpected error from no file name for segment")
 	d ASSERT(0,$d(JSON("errors",2)),"Receved too many errors from no file name for segment")
 	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from no file name for segment")
+	;
+	; invalid access method
+	k BODY,RESULT,ERR,HTTPERR,^TMP("HTTPERR",$J),JSON
+	s BODY="{""names"":{""ZZYOTTADB1"":""ZZYOTTADB""},""regions"":{""ZZYOTTADB"":{""DYNAMIC_SEGMENT"":""ZZYOTTADB""}},""segments"":{""ZZYOTTADB"":{""FILE_NAME"":""/tmp/zzyottadb.dat"",""ACCESS_METHOD"":""ZZ""}}}"
+	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
+	d ASSERT(11,$d(RESULT),"Incorrect Response from invalid access method")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
+	d ASSERT(0,$d(ERR),"Unable to decode JSON from invalid access method")
+	d ASSERT("",$g(HTTPERR),"Incorrect Response from invalid access method")
+	d ASSERT("%GDE-E-QUALREQD, Access method required",$g(JSON("errors",1)),"Receved incorrect error from invalid access method")
+	d ASSERT(0,$d(JSON("errors",2)),"Receved too many errors from invalid access method")
+	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from invalid access method")
 	QUIT
 	;
 save	;; @TEST save web service
@@ -375,6 +385,17 @@ save	;; @TEST save web service
 	d ASSERT(10,$d(JSON("regions","ZZYOTTADB")),"Unable to find added region from Valid Name, Valid Segment, Valid Region verification")
 	d ASSERT(10,$d(JSON("segments","ZZYOTTADB")),"Unable to find added region from Valid Name, Valid Segment, Valid Region verification")
 	;
+	; invalid access method
+	k BODY,RESULT,ERR,HTTPERR,^TMP("HTTPERR",$J),JSON
+	s BODY="{""names"":{""ZZYOTTADB1"":""ZZYOTTADB""},""regions"":{""ZZYOTTADB"":{""DYNAMIC_SEGMENT"":""ZZYOTTADB""}},""segments"":{""ZZYOTTADB"":{""FILE_NAME"":""/tmp/zzyottadb.dat"",""ACCESS_METHOD"":""ZZ""}}}"
+	s RESULT=$$save^GDEWEB(.ARGS,.BODY,.RESULT)
+	d ASSERT(11,$d(RESULT),"Incorrect Response from invalid access method")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
+	d ASSERT(0,$d(ERR),"Unable to decode JSON from invalid access method")
+	d ASSERT("",$g(HTTPERR),"Incorrect Response from invalid access method")
+	d ASSERT("%GDE-E-QUALREQD, Access method required",$g(JSON("errors",1)),"Receved incorrect error from invalid access method")
+	d ASSERT(0,$d(JSON("errors",2)),"Receved too many errors from invalid access method")
+	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from invalid access method")
 	QUIT
 	;
 delete	;; @TEST delete web service

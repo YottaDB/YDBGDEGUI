@@ -300,7 +300,8 @@ save(ARGS,BODY,RESULT)
 	;
 	; Segments:
 	s x="" f  s x=$o(JSON("segments",x)) q:x=""  d
-	. i ($l($g(JSON("segments",x,"ACCESS_METHOD")))) m segs(x)=tmpseg(JSON("segments",x,"ACCESS_METHOD"))
+	. i ($l($g(JSON("segments",x,"ACCESS_METHOD")))),($d(tmpseg(JSON("segments",x,"ACCESS_METHOD")))) m segs(x)=tmpseg(JSON("segments",x,"ACCESS_METHOD"))
+	. e  d message^GDE(gdeerr("QUALREQD"),"""Access method""")
 	. ; remove a GUI artifact TODO: fix the gui
 	. k JSON("segments",x,"NAME")
 	. k JSON("segments",x,"DEFER")
@@ -319,7 +320,7 @@ save(ARGS,BODY,RESULT)
 	m tmpseg=JSON("template","segment")
 	;
 	; Perform verification
-	i $$ALL^GDEVERIF,$$GDEPUT^GDEPUT d
+	i ('$d(gdeweberror)),$$ALL^GDEVERIF,$$GDEPUT^GDEPUT d
 	. s verifyStatus="true"
 	; We didn't pass validation OR couldn't save the global directory
 	e  s verifyStatus="false" ; null value instead of empty string for getMapData?
@@ -444,7 +445,8 @@ verify(ARGS,BODY,RESULT)
 	. i '$d(JSON("segments",SEGMENT,"FILE_NAME")) d message^GDE(gdeerr("QUALREQD"),"""File""") q
 	. i $g(JSON("segments",SEGMENT,"FILE_NAME"))="" d message^GDE(gdeerr("QUALREQD"),"""File""") q
 	. ; End from GDEADD
-	. i ($l($g(JSON("segments",SEGMENT,"ACCESS_METHOD")))) m segs(SEGMENT)=tmpseg(JSON("segments",SEGMENT,"ACCESS_METHOD"))
+	. i ($l($g(JSON("segments",SEGMENT,"ACCESS_METHOD")))),($d(tmpseg(JSON("segments",SEGMENT,"ACCESS_METHOD")))) m segs(SEGMENT)=tmpseg(JSON("segments",SEGMENT,"ACCESS_METHOD"))
+	. e  d message^GDE(gdeerr("QUALREQD"),"""Access method""")
 	. ; remove a GUI artifact TODO: fix the gui
 	. k JSON("segments",SEGMENT,"NAME")
 	. k JSON("segments",SEGMENT,"DEFER")
