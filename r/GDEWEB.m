@@ -102,8 +102,9 @@ get(RESULT,ARGS)
 	n mapreg,mapdispmaxlen,index s mapreg="",mapdispmaxlen=0 D mapdispcalc
 	s s1=$o(map("$"))
 	i s1'="%" s map("%")=map("$"),s1="%"
-	f index=0:1  s s2=s1,s1=$o(map(s2)) q:'$zl(s1)  d onemap(s1,s2)
+	f index=1:1  s s2=s1,s1=$o(map(s2)) q:'$zl(s1)  d onemap(s1,s2)
 	d onemap("...",s2)
+	s index=index+1
 	i $d(nams("#")) s s2="LOCAL LOCKS",map(s2)=nams("#") d onemap("",s2) k map(s2)
 	m result("names")=nams
 	zk result("names")
