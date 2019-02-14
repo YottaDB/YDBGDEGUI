@@ -14,14 +14,17 @@ GDEWEBT	; Run unit tests for GDEWEB/GDE Web services
 	d EN^%ut($t(+0),3)
 	QUIT
 get	;; @TEST get web service
-	n ARGS,RESULT,HTTPERR,JSON
+	n ARGS,RESULT,HTTPERR,JSON,ERR
 	;
 	; Valid data is returned
 	k ARGS,RESULT,HTTPERR,JSON,^TMP("HTTPERR",$J)
 	d get^GDEWEB(.RESULT,.ARGS)
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(10,$d(RESULT),"Unexpected result")
 	d ASSERT("",$g(HTTPERR),"Error returned when there shouldn't be one")
 	d ASSERT(0,$d(^TMP("HTTPERR",$J,1,"error","code")),"Error code not set")
+	d ASSERT("%",$g(JSON("map",1,"from")),"Missing % map")
+	d ASSERT("...",$g(JSON("map",13,"to")),"Missing ... map")
 	QUIT
 	;
 verify	;; @TEST Verify web service
@@ -336,8 +339,8 @@ save	;; @TEST save web service
 	d ASSERT(10,$d(RESULT),"Incorrect Response from Valid Name verification")
 	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name verification response")
-	d ASSERT("ZZYOTTADB",$g(JSON("map",13,"from")),"Unable to find added name from Valid Name verification")
-	d ASSERT("TEMP",$g(JSON("map",13,"region")),"Unable to find added name from Valid Name verification")
+	d ASSERT("ZZYOTTADB",$g(JSON("map",14,"from")),"Unable to find added name from Valid Name verification")
+	d ASSERT("TEMP",$g(JSON("map",14,"region")),"Unable to find added name from Valid Name verification")
 	d ASSERT("TEMP",$g(JSON("names","ZZYOTTADB")),"Unable to find added name from Valid Name verification")
 	;
 	; Name with range
@@ -357,9 +360,9 @@ save	;; @TEST save web service
 	d ASSERT(10,$d(RESULT),"Incorrect Response from Valid Name Range verification")
 	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name Range verification response")
-	d ASSERT("ZZYOTTADB2(1)",$g(JSON("map",15,"from")),"Unable to find added name from Valid Name Range verification")
-	d ASSERT("ZZYOTTADB2(3)",$g(JSON("map",15,"to")),"Unable to find added name from Valid Name Range verification")
-	d ASSERT("TEMP",$g(JSON("map",15,"region")),"Unable to find added name from Valid Name Range verification")
+	d ASSERT("ZZYOTTADB2(1)",$g(JSON("map",16,"from")),"Unable to find added name from Valid Name Range verification")
+	d ASSERT("ZZYOTTADB2(3)",$g(JSON("map",16,"to")),"Unable to find added name from Valid Name Range verification")
+	d ASSERT("TEMP",$g(JSON("map",16,"region")),"Unable to find added name from Valid Name Range verification")
 	d ASSERT("TEMP",$g(JSON("names","ZZYOTTADB2(1:3)")),"Unable to find added name from Valid Name Range verification")
 	;
 	; Valid Name, Valid Segment, Valid Region
@@ -379,8 +382,8 @@ save	;; @TEST save web service
 	d ASSERT(10,$d(RESULT),"Incorrect Response from Valid Name verification")
 	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
 	d ASSERT(0,$d(ERR),"Unable to decode JSON from Valid Name verification response")
-	d ASSERT("ZZYOTTADB1",$g(JSON("map",15,"from")),"Unable to find added name from Valid Name, Valid Segment, Valid Region verification")
-	d ASSERT("ZZYOTTADB",$g(JSON("map",15,"region")),"Unable to find added name from Valid Name, Valid Segment, Valid Region verification")
+	d ASSERT("ZZYOTTADB1",$g(JSON("map",16,"from")),"Unable to find added name from Valid Name, Valid Segment, Valid Region verification")
+	d ASSERT("ZZYOTTADB",$g(JSON("map",16,"region")),"Unable to find added name from Valid Name, Valid Segment, Valid Region verification")
 	d ASSERT("ZZYOTTADB",$g(JSON("names","ZZYOTTADB1")),"Unable to find added name from Valid Name, Valid Segment, Valid Region verification")
 	d ASSERT(10,$d(JSON("regions","ZZYOTTADB")),"Unable to find added region from Valid Name, Valid Segment, Valid Region verification")
 	d ASSERT(10,$d(JSON("segments","ZZYOTTADB")),"Unable to find added region from Valid Name, Valid Segment, Valid Region verification")
