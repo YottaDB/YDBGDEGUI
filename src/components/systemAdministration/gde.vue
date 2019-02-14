@@ -1745,7 +1745,7 @@ export default {
     },
     deletedata() {
       const self = this;
-      axios({
+      return axios({
         method: 'POST',
         url: '/delete',
         data: self.deletedItems,
@@ -1821,10 +1821,10 @@ export default {
       });
       self.verified = true;
     },
-    savedata() {
+    async savedata() {
       const self = this;
       if (self.deletedItems.length > 0) {
-        self.deletedata();
+        await self.deletedata();
       }
       axios({
         method: 'POST',
