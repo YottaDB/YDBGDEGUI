@@ -67,6 +67,8 @@ $ydb_dist/mumps ../r/*.m
 #
 # Subsitutue NOSSL with SSL if you have setup the necessary SSL setup
 cd dist
+export ydb_lct_stdnull=1
+export ydb_local_collate=0 # Note: this is the default
 $ydb_dist/mumps -run ^GDEWEB 8080 NOSSL
 ```
 

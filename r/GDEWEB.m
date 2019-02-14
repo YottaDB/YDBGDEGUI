@@ -19,6 +19,9 @@
 ; d WEB^GDEWEB(9080)
 ;
 WEB(portnum,ssl)
+	; Sanity check env vars to make sure GDE works as intended
+	i (+$ztrnlnm("ydb_local_collate")'=0) w "Local collation environment variable (ydb_local_collate) must be 0" quit
+	i (+$ztrnlnm("ydb_lct_stdnull")'=1) w "Standard null collation environment variable (ydb_lct_stdnull) must be 1" quit
 	; parse arguments
 	n done,args,i
 	s done=0
@@ -290,7 +293,7 @@ save(ARGS,BODY,RESULT)
 	; Regions:
 	s x="" f  s x=$o(JSON("regions",x)) q:x=""  d
 	. m regs(x)=tmpreg
-	. ; remove a GUI artifact TODO: fix the gui
+	. ; remove items that are invalid
 	. k JSON("regions",x,"NAME")
 	. s attr="" f  s attr=$o(JSON("regions",x,attr)) q:attr=""  d
 	. . i '$l($g(JSON("regions",x,attr))) k JSON("regions",x,attr)
@@ -303,9 +306,8 @@ save(ARGS,BODY,RESULT)
 	s x="" f  s x=$o(JSON("segments",x)) q:x=""  d
 	. i ($l($g(JSON("segments",x,"ACCESS_METHOD")))),($d(tmpseg(JSON("segments",x,"ACCESS_METHOD")))) m segs(x)=tmpseg(JSON("segments",x,"ACCESS_METHOD"))
 	. e  d message^GDE(gdeerr("QUALREQD"),"""Access method""")
-	. ; remove a GUI artifact TODO: fix the gui
+	. ; remove items that are invalid
 	. k JSON("segments",x,"NAME")
-	. k JSON("segments",x,"DEFER")
 	. s attr="" f  s attr=$o(JSON("segments",x,attr)) q:attr=""  d
 	. . i '$l($g(JSON("segments",x,attr))) k JSON("segments",x,attr)
 	. ; Now merge the incoming segment
@@ -416,7 +418,7 @@ verify(ARGS,BODY,RESULT)
 	. i '$d(JSON("regions",REGION,"DYNAMIC_SEGMENT")) d message^GDE(gdeerr("QUALREQD"),"""Dynamic_segment""") q
 	. ; End from GDEADD
 	. m regs(REGION)=tmpreg
-	. ; remove a GUI artifact TODO: fix the gui
+	. ; remove items that are invalid
 	. k JSON("regions",REGION,"NAME")
 	. s attr="" f  s attr=$o(JSON("regions",REGION,attr)) q:attr=""  d
 	. . i '$l($g(JSON("regions",REGION,attr))) k JSON("regions",REGION,attr)
@@ -448,9 +450,8 @@ verify(ARGS,BODY,RESULT)
 	. ; End from GDEADD
 	. i ($l($g(JSON("segments",SEGMENT,"ACCESS_METHOD")))),($d(tmpseg(JSON("segments",SEGMENT,"ACCESS_METHOD")))) m segs(SEGMENT)=tmpseg(JSON("segments",SEGMENT,"ACCESS_METHOD"))
 	. e  d message^GDE(gdeerr("QUALREQD"),"""Access method""")
-	. ; remove a GUI artifact TODO: fix the gui
+	. ; remove items that are invalid
 	. k JSON("segments",SEGMENT,"NAME")
-	. k JSON("segments",SEGMENT,"DEFER")
 	. s attr="" f  s attr=$o(JSON("segments",SEGMENT,attr)) q:attr=""  d
 	. . i '$l($g(JSON("segments",SEGMENT,attr))) k JSON("segments",SEGMENT,attr)
 	. ; Now merge the incoming segment
@@ -498,16 +499,12 @@ setup
 	; Prepare special $etrap to issue error in case VIEW "YLCT" call to set local collation fails below
 	; Need to use this instead of the gde $etrap (set a few lines later below) as that expects some initialization
 	; to have happened whereas we are not yet there since setting local collation is a prerequisite for that init.
-	; TODO: re-work error trap to set an error variable instead and quit
 	s $et="w !,$p($zs,"","",3,999) s $ecode="""" d message^GDE(150503603,""""_$zparse(""$ydb_gbldir"","""",""*.gld"")_"""") s ^KBBOET=1 quit"
-	; TODO: This gives error: %GTM-E-COLLDATAEXISTS, Collation type cannot be changed while data exists
-	;v "YLCT":0:1:0		; sets local variable alternate collation = 0, null collation = 1, numeric collation = 0
 	; since GDE creates null subscripts, we don't want user level setting of gtm_lvnullsubs to affect us in any way
 	s gdeEntryState("nullsubs")=$v("LVNULLSUBS")
 	v "LVNULLSUBS"
 	s gdeEntryState("zlevel")=$zlevel-1
 	s gdeEntryState("io")=$io
-	; TODO: re-work error trap to set an error variable instead and quit
 	s $et=$s(debug:"b:$zs'[""%GDE""!allerrs  ",1:"")_"g:(""%GDE%NONAME""[$p($p($zs,"","",3),""-"")) SHOERR^GDE d ABORT^GDE"
 	s io=$io,useio="io",comlevel=0,combase=$zl,resume(comlevel)=$zl_":INTERACT"
 	i $$set^%PATCODE("M")

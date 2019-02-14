@@ -27,5 +27,6 @@ export ydb_log=/opt/yottadb/gui/log
 export ydb_crypt_config=/opt/yottadb/gui/ydbgui.ydbcrypt
 export ydb_icu_version=$(icu-config --version)
 export ydb_tls_passwd_ydbgui="$(echo ydbgui | $ydb_dist/plugin/gtmcrypt/maskpass | cut -d ":" -f2 | tr -d '[:space:]')"
+export ydb_lct_stdnull=1
 
 export PATH=$PATH:/opt/yottadb/current

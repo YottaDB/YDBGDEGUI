@@ -1650,6 +1650,7 @@ export default {
       self.segmentItems = Object.assign([], newSegments);
     },
     ok(type) {
+      let item;
       const self = this;
       self.saved = false;
 
@@ -1660,11 +1661,15 @@ export default {
           self.unsavedItems.names.push(self.selectedItem.name.NAME);
           break;
         case 'segment':
-          self.segments[self.selectedItem.segment.NAME] = self.selectedItem.segment;
+          item = Object.assign({}, self.selectedItem.segment);
+          delete item.NAME;
+          self.segments[self.selectedItem.segment.NAME] = item;
           self.unsavedItems.segments.push(self.selectedItem.segment.NAME);
           break;
         case 'region':
-          self.regions[self.selectedItem.region.NAME] = self.selectedItem.region;
+          item = Object.assign({}, self.selectedItem.region);
+          delete item.NAME;
+          self.regions[self.selectedItem.region.NAME] = item;
           self.unsavedItems.regions.push(self.selectedItem.region.NAME);
           break;
         default:
