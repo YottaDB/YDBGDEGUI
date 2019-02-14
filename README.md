@@ -4,13 +4,19 @@ The YottaDB Global Directory GUI is a browser based application that can be used
 
 # Installation
 
+You will only use one of the below directions (Docker Container OR Manual Setup).
+
 ## Docker Container
 
 A docker container is available on docker hub as `yottadb/yottadbgui` which contains the latest version of the GUI pre-built in production mode. It is primarily designed for demo purposes, future versions may allow for more functionality.
 
 There is only one exposed port `8080` which all webservices and the GUI itself runs on. In the command below it is port forwarded to port `8089`, you can change this on your own local system if there are conflicts or if you want the GUI on a different port.
 
-``` bash
+### Build Docker Container from source
+
+This requires the whole repository to be checked out to build.
+
+```bash
 docker build -t yottadb/yottadbgui:latest .
 docker run -itd -p 8089:8080 --name ydbgui yottadb/yottadbgui:latest
 ```
@@ -75,9 +81,6 @@ The YottaDB Global Directory GUI is built using `vue.js <https://vuejs.org/>`_. 
 ```bash
 # install dependencies
 npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
 
 # build for production with minification
 npm run build
