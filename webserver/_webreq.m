@@ -8,12 +8,13 @@ go ; start up REST listener with defaults
  D job(PORT)
  QUIT
  ;
-job(PORT,TLSCONFIG,NOGBL) ; Convenience entry point
- I $P($SY,",")=47 J start^%webreq(PORT,,$G(TLSCONFIG),$G(NOGBL)):(IN="/dev/null":OUT="vprjreq.mjo":ERR="vprjreq.mje"):5  ; no in and out files please.
- E  J start^%webreq(PORT,"",$G(TLSCONFIG),$G(NOGBL)) ; Cache can't accept an empty string in the second argument
+job(PORT,TLSCONFIG,NOGBL,USERPASS) ; Convenience entry point
+ I $L($G(USERPASS))&($G(USERPASS)'[":") W "USERPASS argument is invalid, must be in username:password format!" QUIT
+ I $P($SY,",")=47 J start^%webreq(PORT,,$G(TLSCONFIG),$G(NOGBL),,$G(USERPASS)):(IN="/dev/null":OUT="vprjreq.mjo":ERR="vprjreq.mje"):5  ; no in and out files please.
+ E  J start^%webreq(PORT,"",$G(TLSCONFIG),$G(NOGBL),,$G(USERPASS)) ; Cache can't accept an empty string in the second argument
  QUIT
  ;
-start(TCPPORT,DEBUG,TLSCONFIG,NOGBL,TRACE) ; set up listening for connections
+start(TCPPORT,DEBUG,TLSCONFIG,NOGBL,TRACE,USERPASS) ; set up listening for connections
  ; I hope TCPPORT needs no explanations.
  ;
  ; DEBUG is so that we run our server in the foreground.
@@ -62,7 +63,7 @@ LOOP ; wait for connection, spawn process to handle it. GOTO favorite.
  I %WOS="CACHE" D  G LOOP
  . R *X:10
  . E  QUIT  ; Loop back again when listening and nobody on the line
- . J CHILD($G(TLSCONFIG)):(:4:TCPIO:TCPIO):10 ; Send off the device to another job for input and output.
+ . J CHILD($G(TLSCONFIG),$G(NOGBL),$G(TRACE),$G(USERPASS)):(:4:TCPIO:TCPIO):10 ; Send off the device to another job for input and output.
  . i $ZA\8196#2=1 W *-2  ; job failed to clear bit
  ; ---- END CACHE CODE ----
  ;
@@ -86,7 +87,7 @@ LOOP ; wait for connection, spawn process to handle it. GOTO favorite.
  . . U TCPIO:(detach=CHILDSOCK)
  . . N Q S Q=""""
  . . N ARG S ARG=Q_"SOCKET:"_CHILDSOCK_Q
- . . N J S J="CHILD($G(TLSCONFIG),$G(NOGBL),$G(TRACE)):(input="_ARG_":output="_ARG_")"
+ . . N J S J="CHILD($G(TLSCONFIG),$G(NOGBL),$G(TRACE),$G(USERPASS)):(input="_ARG_":output="_ARG_")"
  . . J @J
  . ;
  . ; GT.M before 6.1:
@@ -138,7 +139,7 @@ GTMLNX  ;From Linux xinetd script; $P is the main stream
  ; HTTPLOG indicates the logging level for this process
  ; HTTPERR non-zero if there is an error state
  ;
-CHILD(TLSCONFIG,NOGBL,TRACE) ; handle HTTP requests on this connection
+CHILD(TLSCONFIG,NOGBL,TRACE,USERPASS) ; handle HTTP requests on this connection
 CHILDDEBUG ; [Internal] Debugging entry point
  N %WTCP S %WTCP=$GET(TCPIO,$PRINCIPAL) ; TCP Device
  N %WOS S %WOS=$S($P($SY,",")=47:"GT.M",$P($SY,",")=50:"MV1",1:"CACHE") ; Get Mumps Virtual Machine
