@@ -55,7 +55,7 @@ WEB(portnum,ssl,userpass)
 	; Start the web server
 	i $l($t(^%webreq)) d
 	. w "Starting Web Server...",!
-	. d job^%webreq($g(portnum,8080),$s(ssl:"ydbgui",1:""),,$g(userpass))
+	. d job^%webreq($g(portnum,8080),$s(ssl:"ydbgui",1:""),1,$g(userpass))
 	e  d
 	. w "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
 	quit
@@ -523,6 +523,8 @@ setup
 	d GDEINIT^GDEINIT,GDEMSGIN^GDEMSGIN,GDFIND^GDESETGD,CREATE^GDEGET:create,LOAD^GDEGET:'create
 	s useio="io"
 	s io=$io
+	; Using the GDE Defaults isn't an error. Kill it so the webservices can move on
+	i ($g(gdeweberror("count"))=1),gdeweberror(1)["%GDE-I-GDUSEDEFS" k gdeweberror
 	quit
 ;
 ; =========================================================================

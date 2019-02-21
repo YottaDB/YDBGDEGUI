@@ -57,7 +57,7 @@ start(TCPPORT,DEBUG,TLSCONFIG,NOGBL,TRACE,USERPASS) ; set up listening for conne
  I $G(DEBUG) D DEBUG($G(TLSCONFIG))
  ;
 LOOP ; wait for connection, spawn process to handle it. GOTO favorite.
- I '$G(NOGBL)&$E(^%webhttp(0,"listener"),1,4)="stop" C TCPIO S ^%webhttp(0,"listener")="stopped" Q
+ I '$G(NOGBL),$E(^%webhttp(0,"listener"),1,4)="stop" C TCPIO S ^%webhttp(0,"listener")="stopped" Q
  ;
  ; ---- CACHE CODE ----
  I %WOS="CACHE" D  G LOOP
@@ -75,10 +75,10 @@ LOOP ; wait for connection, spawn process to handle it. GOTO favorite.
  . ;
  . ; Wait until we have a connection (inifinte wait). 
  . ; Stop if the listener asked us to stop.
- . FOR  W /WAIT(10) Q:$KEY]""  Q:('$G(NOGBL)&$E(^%webhttp(0,"listener"),1,4)="stop")
+ . FOR  W /WAIT(10) Q:$KEY]""  Q:$G(NOGBL)  Q:($E(^%webhttp(0,"listener"),1,4)="stop")
  . ;
  . ; We have to stop! When we quit, we go to loop, and we exit at LOOP+1
- . I '$G(NOGBL)&$E(^%webhttp(0,"listener"),1,4)="stop" QUIT
+ . I '$G(NOGBL),$E(^%webhttp(0,"listener"),1,4)="stop" QUIT
  . ; 
  . ; At connection, job off the new child socket to be served away.
  . ; I $P($KEY,"|")="CONNECT" QUIT ; before 6.1
@@ -146,7 +146,8 @@ CHILDDEBUG ; [Internal] Debugging entry point
  ;
  I %WOS="GT.M",'$G(NOGBL),$G(TRACE) VIEW "TRACE":1:"^%wtrace" ; Tracing for Unit Test Coverage
  ;
- S HTTPLOG=$G(^%webhttp(0,"logging"),0) ; HTTPLOG remains set throughout
+ S:'$G(NOGBL) HTTPLOG=$G(^%webhttp(0,"logging"),0) ; HTTPLOG remains set throughout
+ S:$G(NOGBL) HTTPLOG=0
  S HTTPLOG("DT")=+$H
  D INCRLOG ; set unique request id for log
  N $ET S $ET="G ETSOCK^%webreq"
@@ -170,7 +171,7 @@ NEXT ; begin next request
  K:'$G(NOGBL) ^TMP($J),^TMP("HTTPERR",$J) ; TODO: change the namespace for the error global
  ;
 WAIT ; wait for request on this connection
- I '$G(NOGBL)&$E($G(^%webhttp(0,"listener")),1,4)="stop" C %WTCP Q
+ I '$G(NOGBL),$E($G(^%webhttp(0,"listener")),1,4)="stop" C %WTCP Q
  X:%WOS="CACHE" "U %WTCP:(::""CT"")" ;VEN/SMH - Cache Only line; Terminators are $C(10,13)
  X:%WOS="GT.M" "U %WTCP:(delim=$C(13,10):chset=""M"")" ; VEN/SMH - GT.M Delimiters
  R TCPX:10 I '$T G ETDC
@@ -284,8 +285,8 @@ ETCODE ; error trap when calling out to routines
  I $D(%WNULL) C %WNULL
  U %WTCP
  D LOGERR
- D SETERROR^%webutils(501,"Log ID:"_HTTPLOG("ID")) ; sets HTTPERR
- D RSPERROR^%webrsp  ; switch to error response
+ D:'$G(NOGBL) SETERROR^%webutils(501,"Log ID:"_HTTPLOG("ID")) ; sets HTTPERR
+ D:'$G(NOGBL) RSPERROR^%webrsp  ; switch to error response
  D SENDATA^%webrsp
  ; Leave $ECODE as non-null so that the error handling continues.
  ; This next line will 'unwind' the stack and got back to listening
@@ -364,10 +365,11 @@ LOGDC ; log client disconnection; VEN/SMH
  QUIT
  ;
 LOGERR ; log error information
+ Q:$G(NOGBL)
  N %D,%I
  S %D=HTTPLOG("DT"),%I=HTTPLOG("ID")
  N ISGTM S ISGTM=$P($SYSTEM,",")=47
- S:'$G(NOGBL) ^%webhttp("log",%D,$J,%I,"error")=$S(ISGTM:$ZSTATUS,1:$ZERROR_"  ($ECODE:"_$ECODE_")")
+ S ^%webhttp("log",%D,$J,%I,"error")=$S(ISGTM:$ZSTATUS,1:$ZERROR_"  ($ECODE:"_$ECODE_")")
  N %LVL,%TOP,%N
  S %TOP=$STACK(-1)-1,%N=0
  F %LVL=0:1:%TOP S %N=%N+1,^%webhttp("log",%D,$J,%I,"error","stack",%N)=$STACK(%LVL,"PLACE")_":"_$STACK(%LVL,"MCODE")

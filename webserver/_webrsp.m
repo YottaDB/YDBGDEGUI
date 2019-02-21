@@ -110,7 +110,7 @@ MATCH(ROUTINE,ARGS,PARAMS,AUTHNODE) ; evaluate paths in sequence until match fou
  S ROUTINE=""  ; Default. Routine not found. Error 404.
  ;
  ; If we have the %W file for mapping...
- IF $D(^%web(17.6001)) DO MATCHF(.ROUTINE,.ARGS,.PARAMS,.AUTHNODE)
+ IF ('$G(NOGBL)),$D(^%web(17.6001)) DO MATCHF(.ROUTINE,.ARGS,.PARAMS,.AUTHNODE)
  ;
  ; Using built-in table if routine is still empty.
  I ROUTINE="" DO MATCHR(.ROUTINE,.ARGS)
@@ -363,6 +363,7 @@ GZIP ; EP to write gzipped content
  QUIT
  ;
 RSPERROR ; set response to be an error response
+ Q:$G(NOGBL)
  D encode^%webjson("^TMP(""HTTPERR"",$J,1)","^TMP(""HTTPERR"",$J,""JSON"")")
  S HTTPRSP="^TMP(""HTTPERR"",$J,""JSON"")"
  K HTTPRSP("pageable")
