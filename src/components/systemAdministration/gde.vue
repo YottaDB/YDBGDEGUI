@@ -642,11 +642,11 @@
               <div class="w-100"/>
               <b-col>
                 <label for="journal">
-                  Journal Option List:
+                  Enable Journal:
                 </label>
               </b-col>
               <b-col>
-                <b-input
+                <b-check
                   id="journal"
                   v-model="selectedItem.region.JOURNAL"/>
               </b-col>
@@ -1073,11 +1073,11 @@
             <div class="w-100"/>
             <b-col>
               <label for="journal">
-                Journal Option List:
+                Enable Journal:
               </label>
             </b-col>
             <b-col>
-              <b-input
+              <b-check
                 id="journal"
                 v-model="selectedItem.region.JOURNAL"/>
             </b-col>
@@ -1338,7 +1338,7 @@ export default {
           COLLATION_DEFAULT: 0,
           EPOCHTAPER: true,
           INST_FREEZE_ON_ERROR: false,
-          JOURNAL: '',
+          JOURNAL: false,
           AUTOSWITCHLIMIT: '',
           BEFORE_IMAGE: false,
           FILE_NAME: '',
@@ -1557,7 +1557,7 @@ export default {
             COLLATION_DEFAULT: 0,
             EPOCHTAPER: true,
             INST_FREEZE_ON_ERROR: false,
-            JOURNAL: '',
+            JOURNAL: false,
             AUTOSWITCHLIMIT: '',
             BEFORE_IMAGE: false,
             FILE_NAME: '',
@@ -1784,6 +1784,27 @@ export default {
     verifydata() {
       const self = this;
       self.verified = false;
+
+      // Convert Javascript booleans to 1/0 for webservice
+      Object.keys(self.regions).forEach((name) => {
+        self.regions[name].NULL_SUBSCRIPTS = (self.regions[name].NULL_SUBSCRIPTS ? 1 : 0);
+        self.regions[name].STDNULLCOLL = (self.regions[name].STDNULLCOLL ? 1 : 0);
+        self.regions[name].JOURNAL = (self.regions[name].JOURNAL ? 1 : 0);
+        self.regions[name].INST_FREEZE_ON_ERROR = (self.regions[name].INST_FREEZE_ON_ERROR ? 1 : 0);
+        self.regions[name].QDBRUNDOWN = (self.regions[name].QDBRUNDOWN ? 1 : 0);
+        self.regions[name].EPOCHTAPER = (self.regions[name].EPOCHTAPER ? 1 : 0);
+        self.regions[name].AUTODB = (self.regions[name].AUTODB ? 1 : 0);
+        self.regions[name].STATS = (self.regions[name].STATS ? 1 : 0);
+        self.regions[name].LOCK_CRIT_SEPARATE = (self.regions[name].LOCK_CRIT_SEPARATE ? 1 : 0);
+        self.regions[name].BEFORE_IMAGE = (self.regions[name].BEFORE_IMAGE ? 1 : 0);
+      });
+
+      Object.keys(self.segments).forEach((name) => {
+        self.segments[name].ENCRYPTION_FLAG = (self.segments[name].ENCRYPTION_FLAG ? 1 : 0);
+        self.segments[name].DEFER_ALLOCATE = (self.segments[name].DEFER_ALLOCATE ? 1 : 0);
+        self.segments[name].ASYNCIO = (self.segments[name].ASYNCIO ? 1 : 0);
+      });
+
       axios({
         method: 'POST',
         url: '/verify',
