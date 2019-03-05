@@ -18,7 +18,7 @@
 ; @example
 ; d WEB^GDEWEB(9080)
 ;
-WEB(portnum,ssl)
+WEB(portnum,ssl,userpass)
 	; Sanity check env vars to make sure GDE works as intended
 	i (+$ztrnlnm("ydb_local_collate")'=0) w "Local collation environment variable (ydb_local_collate) must be 0" quit
 	i (+$ztrnlnm("ydb_lct_stdnull")'=1) w "Standard null collation environment variable (ydb_lct_stdnull) must be 1" quit
@@ -27,9 +27,13 @@ WEB(portnum,ssl)
 	s done=0
 	f i=1:1:$l($zcmdline," ") d
 	. s args(i)=$p($zcmdline," ",i)
+	; port number
 	i $l($g(args(1)))&($g(args(1))=+$g(args(1))) s portnum=args(1)
 	e  s portnum=""
+	; ssl/tls config
 	i $l($g(args(2))) s ssl=args(2)
+	; admin username/password
+	i $l($g(args(3))) s userpass=args(3)
 	;
 	; Get the port number to run on
 	i '$l(portnum)  w "No port number specified, or invalid - using default of 8080",!
@@ -45,10 +49,13 @@ WEB(portnum,ssl)
 	i ((ssl="nossl")!(ssl="NOSSL")!(ssl=0)) s ssl=0 w "SSL configuration NOT found!",!
 	i 'ssl w "WARNING: Web server started without SSL/TLS",!
 	;
+	; Make sure userpass argument is valid
+	i $l($g(userpass))&($g(userpass)'[":") w "userpass argument must be in username:password format!",!,$g(userpass),!,"Quitting...",! quit
+	;
 	; Start the web server
 	i $l($t(^%webreq)) d
 	. w "Starting Web Server...",!
-	. d job^%webreq($g(portnum,8080),$s(ssl:"ydbgui",1:""))
+	. d job^%webreq($g(portnum,8080),$s(ssl:"ydbgui",1:""),1,$g(userpass))
 	e  d
 	. w "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
 	quit
@@ -516,6 +523,8 @@ setup
 	d GDEINIT^GDEINIT,GDEMSGIN^GDEMSGIN,GDFIND^GDESETGD,CREATE^GDEGET:create,LOAD^GDEGET:'create
 	s useio="io"
 	s io=$io
+	; Using the GDE Defaults isn't an error. Kill it so the webservices can move on
+	i ($g(gdeweberror("count"))=1),gdeweberror(1)["%GDE-I-GDUSEDEFS" k gdeweberror
 	quit
 ;
 ; =========================================================================

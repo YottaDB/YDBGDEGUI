@@ -110,7 +110,7 @@ MATCH(ROUTINE,ARGS,PARAMS,AUTHNODE) ; evaluate paths in sequence until match fou
  S ROUTINE=""  ; Default. Routine not found. Error 404.
  ;
  ; If we have the %W file for mapping...
- IF $D(^%web(17.6001)) DO MATCHF(.ROUTINE,.ARGS,.PARAMS,.AUTHNODE)
+ IF ('$G(NOGBL)),$D(^%web(17.6001)) DO MATCHF(.ROUTINE,.ARGS,.PARAMS,.AUTHNODE)
  ;
  ; Using built-in table if routine is still empty.
  I ROUTINE="" DO MATCHR(.ROUTINE,.ARGS)
@@ -121,7 +121,14 @@ MATCH(ROUTINE,ARGS,PARAMS,AUTHNODE) ; evaluate paths in sequence until match fou
  ; Okay. Do we have a routine to execute?
  I ROUTINE="" D SETERROR^%webutils(404,"Not Found") QUIT
  ;
+ I $l($g(USERPASS)) S AUTHNODE=1
  I +$G(AUTHNODE) D  ; Web Service has authorization node
+ . ;
+ . I $d(USERPASS) D  QUIT
+ . . ; First, user must authenticate
+ . . S HTTPRSP("auth")="Basic realm="""_HTTPREQ("header","host")_"""" ; Send Authentication Header
+ . . N AUTHEN S AUTHEN=(USERPASS=$$DECODE64^%webutils($P($G(HTTPREQ("header","authorization"))," ",2))) ; Try to authenticate
+ . . I 'AUTHEN D SETERROR^%webutils(401) QUIT  ; Unauthoirzed
  . ;
  . ; If there is no File 200, forget the whole thing. Pretend it didn't happen.
  . I '$D(^VA(200)) QUIT
@@ -356,6 +363,7 @@ GZIP ; EP to write gzipped content
  QUIT
  ;
 RSPERROR ; set response to be an error response
+ Q:$G(NOGBL)
  D encode^%webjson("^TMP(""HTTPERR"",$J,1)","^TMP(""HTTPERR"",$J,""JSON"")")
  S HTTPRSP="^TMP(""HTTPERR"",$J,""JSON"")"
  K HTTPRSP("pageable")

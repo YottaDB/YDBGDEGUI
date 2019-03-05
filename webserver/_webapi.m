@@ -263,8 +263,8 @@ FILESYS(RESULT,ARGS) ; Handle filesystem/*
  N ISCACHE S ISCACHE=$L($SY,":")=2
  N PATH
  ;
- ; Vhere is our home? If any home!
- if $get(^%webhome)'="" D
+ ; Where is our home? If any home!
+ if ('$G(NOGBL)),($get(^%webhome)'="") D
  . I ISGTM S $ZD=^%webhome ; GT.M
  . I ISCACHE N % S %=$ZU(168,^%webhome) ; Cache
  ;

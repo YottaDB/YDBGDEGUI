@@ -22,7 +22,7 @@ source /opt/yottadb/gui/env
 
 # Start the GUI
 cd /opt/yottadb/gui/dist
-/opt/yottadb/current/mumps -run ^GDEWEB 8080 SSL
+/opt/yottadb/current/mumps -run ^GDEWEB 8080 SSL admin:admin
 
 # Webserver doesn't daemonize, use a fifo to allow bash to capture
 # signals from docker

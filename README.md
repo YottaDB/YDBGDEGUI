@@ -22,6 +22,7 @@ docker run -itd -p 8089:8080 --name ydbgui yottadb/yottadbgui:latest
 ```
 
 To use the GUI go to https://localhost:8089 in a web browser.
+The default username/password is admin/admin.
 
 ## Manual Setup
 
@@ -69,10 +70,11 @@ $ydb_dist/mumps ../r/*.m
 cd dist
 export ydb_lct_stdnull=1
 export ydb_local_collate=0 # Note: this is the default
-$ydb_dist/mumps -run ^GDEWEB 8080 NOSSL
+$ydb_dist/mumps -run ^GDEWEB 8080 NOSSL admin:admin
 ```
 
 8080 is the port number in which to start the web server and can be adjusted to any port number that is available on your system.
+admin:admin is the username:password to use for authentication and can be set to a combination you desire.
 
 # Development
 
