@@ -37,7 +37,7 @@
                 :key="menu.name"
                 class="menu-item menu-item-has-children">
                 <router-link
-                  :to="menu.url"
+                  :to="menu.to"
                   v-text="menu.name"/>
                 <ul class="sub-menu">
                   <li
@@ -45,7 +45,13 @@
                     :key="submenu.name"
                     class="menu-item">
                     <router-link
-                      :to="submenu.url"
+                      v-if="submenu.to"
+                      :to="submenu.to"
+                      v-text="submenu.name"/>
+                    <b-link
+                      v-if="submenu.href"
+                      :href="submenu.href"
+                      target="_blank"
                       v-text="submenu.name"/>
                   </li>
                 </ul>
@@ -67,67 +73,67 @@ export default {
         main: [
           {
             name: 'System Administraton',
-            url: '#',
+            to: '#',
             submenus: [
               {
                 name: 'Global Directory Editor (GDE)',
-                url: 'gde',
+                to: '/',
               },
-              {
-                name: 'Data Structure Editor (DSE)',
-                url: '#',
-              },
-              {
-                name: 'SQL Management',
-                url: '#',
-              },
-              {
-                name: 'Web Server',
-                url: '#',
-              },
-              {
-                name: 'Call-In Management',
-                url: '#',
-              },
-              {
-                name: 'Call-Out Management',
-                url: '#',
-              },
+              // {
+              //   name: 'Data Structure Editor (DSE)',
+              //   to: '#',
+              // },
+              // {
+              //   name: 'SQL Management',
+              //   to: '#',
+              // },
+              // {
+              //   name: 'Web Server',
+              //   to: '#',
+              // },
+              // {
+              //   name: 'Call-In Management',
+              //   to: '#',
+              // },
+              // {
+              //   name: 'Call-Out Management',
+              //   to: '#',
+              // },
             ],
           },
-          {
-            name: 'Monitoring',
-            url: '#',
-            submenus: [
-              {
-                name: 'InfoHub',
-                url: '#',
-              },
-              {
-                name: 'gvstat',
-                url: '#',
-              },
-              {
-                name: 'Database Performance',
-                url: '#',
-              },
-              {
-                name: 'SQL Cached Queries',
-                url: '#',
-              },
-              {
-                name: 'Web Server',
-                url: '#',
-              },
-            ],
-          },
+          // {
+          //   name: 'Monitoring',
+          //   to: '#',
+          //   submenus: [
+          //     {
+          //       name: 'InfoHub',
+          //       to: '#',
+          //     },
+          //     {
+          //       name: 'gvstat',
+          //       to: '#',
+          //     },
+          //     {
+          //       name: 'Database Performance',
+          //       to: '#',
+          //     },
+          //     {
+          //       name: 'SQL Cached Queries',
+          //       to: '#',
+          //     },
+          //     {
+          //       name: 'Web Server',
+          //       to: '#',
+          //     },
+          //   ],
+          // },
           {
             name: 'Resources',
-            url: '#',
+            to: '#',
             submenus: [
               {
                 name: 'Documentation',
-                url: 'https://yottadb.com/resources/documentation/',
+                href: 'https://yottadb.com/resources/documentation/',
               },
             ],
           },
