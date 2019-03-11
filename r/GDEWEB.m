@@ -152,6 +152,9 @@ get(RESULT,ARGS)
 	n i
 	f i=2:1:$l(accmeth,"\") s result("accessMethods",i-1)=$zpi(accmeth,"\",i)
 	;
+	; convert to booleans
+	d inttobool(.result)
+	; encode the result
 	d ENCODE^%webjson("result","RESULT","ERR")
 	i $d(ERR) D SETERROR^%webutils(201) quit
 	quit
@@ -285,6 +288,9 @@ save(ARGS,BODY,RESULT)
 	n uname
 	s debug=""
 	;
+	; Convert boolean to integer
+	d booltoint(.JSON)
+	;
 	; Names:
 	m nams=JSON("names")
 	s x="" f  s x=$o(nams(x)) q:x=""  d
@@ -380,6 +386,9 @@ verify(ARGS,BODY,RESULT)
 	s useio="io"
 	d setup
 	n NAME,RSLT,region,attr,temp,SEGMENT,REGION
+	;
+	; Convert boolean to integer
+	d booltoint(.JSON)
 	;
 	; Names:
 	s x="" f  s x=$o(JSON("names",x)) q:x=""  d
@@ -525,6 +534,38 @@ setup
 	s io=$io
 	; Using the GDE Defaults isn't an error. Kill it so the webservices can move on
 	i ($g(gdeweberror("count"))=1),gdeweberror(1)["%GDE-I-GDUSEDEFS" k gdeweberror
+	quit
+;
+; This converts object properties from boolean true/false to integer 1/0
+;
+; @input object - gde object structure
+booltoint(object)
+	n REGION,SEGMENT,ITEM
+	; There is nothing in names that would need to be converted
+	s REGION="" f  s REGION=$o(object("regions",REGION)) q:REGION=""  d
+	. s ITEM="" f ITEM="NULL_SUBSCRIPTS","STDNULLCOLL","JOURNAL","INST_FREEZE_ON_ERROR","QDBRUNDOWN","EPOCHTAPER","AUTODB","STATS","LOCK_CRIT_SEPARATE","BEFORE_IMAGE" d
+	. . i object("regions",REGION,ITEM)="true" s object("regions",REGION,ITEM)=1
+	. . e  i object("regions",REGION,ITEM)="false" s object("regions",REGION,ITEM)=0
+	s SEGMENT="" f  s SEGMENT=$o(object("segments",SEGMENT)) q:SEGMENT=""  d
+	. s ITEM="" f ITEM="ENCRYPTION_FLAG","DEFER_ALLOCATE","ASYNCIO" d
+	. . i object("segments",SEGMENT,ITEM)="true" s object("segments",SEGMENT,ITEM)=1
+	. . e  i object("segments",SEGMENT,ITEM)="false" s object("segments",SEGMENT,ITEM)=0
+	quit
+;
+; This converts object properties from integer 1/0 to boolean true/false
+;
+; @input object - gde object structure
+inttobool(object)
+	n REGION,SEGMENT,ITEM
+	; There is nothing in names that would need to be converted
+	s REGION="" f  s REGION=$o(object("regions",REGION)) q:REGION=""  d
+	. s ITEM="" f ITEM="NULL_SUBSCRIPTS","STDNULLCOLL","JOURNAL","INST_FREEZE_ON_ERROR","QDBRUNDOWN","EPOCHTAPER","AUTODB","STATS","LOCK_CRIT_SEPARATE","BEFORE_IMAGE" d
+	. . i object("regions",REGION,ITEM)=1 s object("regions",REGION,ITEM)="true"
+	. . e  i object("regions",REGION,ITEM)=0 s object("regions",REGION,ITEM)="false"
+	s SEGMENT="" f  s SEGMENT=$o(object("segments",SEGMENT)) q:SEGMENT=""  d
+	. s ITEM="" f ITEM="ENCRYPTION_FLAG","DEFER_ALLOCATE","ASYNCIO" d
+	. . i object("segments",SEGMENT,ITEM)=1 s object("segments",SEGMENT,ITEM)="true"
+	. . e  i object("segments",SEGMENT,ITEM)=0 s object("segments",SEGMENT,ITEM)="false"
 	quit
 ;
 ; =========================================================================

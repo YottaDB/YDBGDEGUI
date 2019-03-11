@@ -1606,17 +1606,17 @@ export default {
           defaultCollation: self.regions[name].COLLATION_DEFAULT,
           recordSize: self.regions[name].RECORD_SIZE,
           keySize: self.regions[name].KEY_SIZE,
-          nullSubscripts: !!+self.regions[name].NULL_SUBSCRIPTS,
-          standardNullCollation: !!+self.regions[name].STDNULLCOLL,
-          journal: !!+self.regions[name].JOURNAL,
-          instFreezeOnError: !!+self.regions[name].INST_FREEZE_ON_ERROR,
-          qDbRundown: !!+self.regions[name].QDBRUNDOWN,
-          epochTaper: !!+self.regions[name].EPOCHTAPER,
-          autodb: !!+self.regions[name].AUTODB,
-          stats: !!+self.regions[name].STATS,
-          lockCrit: !!+self.regions[name].LOCK_CRIT_SEPARATE,
+          nullSubscripts: self.regions[name].NULL_SUBSCRIPTS,
+          standardNullCollation: self.regions[name].STDNULLCOLL,
+          journal: self.regions[name].JOURNAL,
+          instFreezeOnError: self.regions[name].INST_FREEZE_ON_ERROR,
+          qDbRundown: self.regions[name].QDBRUNDOWN,
+          epochTaper: self.regions[name].EPOCHTAPER,
+          autodb: self.regions[name].AUTODB,
+          stats: self.regions[name].STATS,
+          lockCrit: self.regions[name].LOCK_CRIT_SEPARATE,
           journalFileName: self.regions[name].FILE_NAME,
-          beforeImage: !!+self.regions[name].BEFORE_IMAGE,
+          beforeImage: self.regions[name].BEFORE_IMAGE,
           bufferSize: self.regions[name].BUFFER_SIZE,
           allocation: self.regions[name].ALLOCATION,
           extensionCount: self.regions[name].EXTENSION,
@@ -1640,10 +1640,10 @@ export default {
           globalBufferCount: self.segments[name].GLOBAL_BUFFER_COUNT,
           lockSpace: self.segments[name].LOCK_SPACE,
           reservedBytes: self.segments[name].RESERVED_BYTES,
-          encryption: !!+self.segments[name].ENCRYPTION_FLAG,
+          encryption: self.segments[name].ENCRYPTION_FLAG,
           mutexSlots: self.segments[name].MUTEX_SLOTS,
-          deferAllocate: !!+self.segments[name].DEFER_ALLOCATE,
-          asyncIO: !!+self.segments[name].ASYNCIO,
+          deferAllocate: self.segments[name].DEFER_ALLOCATE,
+          asyncIO: self.segments[name].ASYNCIO,
         };
         newSegments.push(displaySegment);
       });
@@ -1784,26 +1784,6 @@ export default {
     verifydata() {
       const self = this;
       self.verified = false;
-
-      // Convert Javascript booleans to 1/0 for webservice
-      Object.keys(self.regions).forEach((name) => {
-        self.regions[name].NULL_SUBSCRIPTS = (self.regions[name].NULL_SUBSCRIPTS ? 1 : 0);
-        self.regions[name].STDNULLCOLL = (self.regions[name].STDNULLCOLL ? 1 : 0);
-        self.regions[name].JOURNAL = (self.regions[name].JOURNAL ? 1 : 0);
-        self.regions[name].INST_FREEZE_ON_ERROR = (self.regions[name].INST_FREEZE_ON_ERROR ? 1 : 0);
-        self.regions[name].QDBRUNDOWN = (self.regions[name].QDBRUNDOWN ? 1 : 0);
-        self.regions[name].EPOCHTAPER = (self.regions[name].EPOCHTAPER ? 1 : 0);
-        self.regions[name].AUTODB = (self.regions[name].AUTODB ? 1 : 0);
-        self.regions[name].STATS = (self.regions[name].STATS ? 1 : 0);
-        self.regions[name].LOCK_CRIT_SEPARATE = (self.regions[name].LOCK_CRIT_SEPARATE ? 1 : 0);
-        self.regions[name].BEFORE_IMAGE = (self.regions[name].BEFORE_IMAGE ? 1 : 0);
-      });
-
-      Object.keys(self.segments).forEach((name) => {
-        self.segments[name].ENCRYPTION_FLAG = (self.segments[name].ENCRYPTION_FLAG ? 1 : 0);
-        self.segments[name].DEFER_ALLOCATE = (self.segments[name].DEFER_ALLOCATE ? 1 : 0);
-        self.segments[name].ASYNCIO = (self.segments[name].ASYNCIO ? 1 : 0);
-      });
 
       axios({
         method: 'POST',
