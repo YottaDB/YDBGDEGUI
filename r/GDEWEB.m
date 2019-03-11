@@ -544,12 +544,12 @@ booltoint(object)
 	; There is nothing in names that would need to be converted
 	s REGION="" f  s REGION=$o(object("regions",REGION)) q:REGION=""  d
 	. s ITEM="" f ITEM="NULL_SUBSCRIPTS","STDNULLCOLL","JOURNAL","INST_FREEZE_ON_ERROR","QDBRUNDOWN","EPOCHTAPER","AUTODB","STATS","LOCK_CRIT_SEPARATE","BEFORE_IMAGE" d
-	. . i object("regions",REGION,ITEM)="true" s object("regions",REGION,ITEM)=1
-	. . e  i object("regions",REGION,ITEM)="false" s object("regions",REGION,ITEM)=0
+	. . i $g(object("regions",REGION,ITEM))="true" s object("regions",REGION,ITEM)=1
+	. . e  i $g(object("regions",REGION,ITEM))="false" s object("regions",REGION,ITEM)=0
 	s SEGMENT="" f  s SEGMENT=$o(object("segments",SEGMENT)) q:SEGMENT=""  d
 	. s ITEM="" f ITEM="ENCRYPTION_FLAG","DEFER_ALLOCATE","ASYNCIO" d
-	. . i object("segments",SEGMENT,ITEM)="true" s object("segments",SEGMENT,ITEM)=1
-	. . e  i object("segments",SEGMENT,ITEM)="false" s object("segments",SEGMENT,ITEM)=0
+	. . i $g(object("segments",SEGMENT,ITEM))="true" s object("segments",SEGMENT,ITEM)=1
+	. . e  i $g(object("segments",SEGMENT,ITEM))="false" s object("segments",SEGMENT,ITEM)=0
 	quit
 ;
 ; This converts object properties from integer 1/0 to boolean true/false
@@ -560,12 +560,12 @@ inttobool(object)
 	; There is nothing in names that would need to be converted
 	s REGION="" f  s REGION=$o(object("regions",REGION)) q:REGION=""  d
 	. s ITEM="" f ITEM="NULL_SUBSCRIPTS","STDNULLCOLL","JOURNAL","INST_FREEZE_ON_ERROR","QDBRUNDOWN","EPOCHTAPER","AUTODB","STATS","LOCK_CRIT_SEPARATE","BEFORE_IMAGE" d
-	. . i object("regions",REGION,ITEM)=1 s object("regions",REGION,ITEM)="true"
-	. . e  i object("regions",REGION,ITEM)=0 s object("regions",REGION,ITEM)="false"
+	. . i $g(object("regions",REGION,ITEM))=1 s object("regions",REGION,ITEM)="true"
+	. . e  i $g(object("regions",REGION,ITEM))=0 s object("regions",REGION,ITEM)="false"
 	s SEGMENT="" f  s SEGMENT=$o(object("segments",SEGMENT)) q:SEGMENT=""  d
 	. s ITEM="" f ITEM="ENCRYPTION_FLAG","DEFER_ALLOCATE","ASYNCIO" d
-	. . i object("segments",SEGMENT,ITEM)=1 s object("segments",SEGMENT,ITEM)="true"
-	. . e  i object("segments",SEGMENT,ITEM)=0 s object("segments",SEGMENT,ITEM)="false"
+	. . i $g(object("segments",SEGMENT,ITEM))=1 s object("segments",SEGMENT,ITEM)="true"
+	. . e  i $g(object("segments",SEGMENT,ITEM))=0 s object("segments",SEGMENT,ITEM)="false"
 	quit
 ;
 ; =========================================================================
