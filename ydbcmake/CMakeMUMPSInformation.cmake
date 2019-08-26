@@ -29,7 +29,7 @@ set(CMAKE_MUMPS_CREATE_STATIC_LIBRARY "")
 
 # Option to suppress mumps compiler warnings
 option(MUMPS_NOWARNING "Disable warnings and ignore status code from MUMPS compiler")
-set(CMAKE_MUMPS_COMPILE_OBJECT "LC_ALL=\"${LC_ALL}\" ydb_chset=\"${ydb_chset}\" ydb_icu_version=\"${icu_version}\" <CMAKE_MUMPS_COMPILER> -object=<OBJECT>")
+set(CMAKE_MUMPS_COMPILE_OBJECT "LC_ALL=\"${LC_ALL}\" ydb_chset=\"${ydb_chset}\" ydb_icu_version=\"${icu_version}\" <CMAKE_MUMPS_COMPILER> -object=<OBJECT> -embed_source -dynamic_literals")
 
 if(MUMPS_NOWARNING)
   set(CMAKE_MUMPS_COMPILE_OBJECT "${CMAKE_MUMPS_COMPILE_OBJECT}  -nowarning <SOURCE> || true")

@@ -23,7 +23,10 @@ RUN apt-get update && \
       libgcrypt11-dev \
       libgpgme11-dev \
       libconfig-dev \
-      libssl-dev && \
+      libssl-dev \
+      cmake \
+      git \
+      && \
     apt-get clean
 
 # Install ydb_crypt plugin
@@ -47,24 +50,35 @@ RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.s
 	. $HOME/.nvm/nvm.sh && \
     nvm install --lts
 
-# Build GDE GUI
-RUN . $HOME/.nvm/nvm.sh && \
-    cd /opt/yottadb/gui && \
-    npm install && \
-    npm run build
-
-# Compile M programs
+# Install M Web Server
 RUN . /opt/yottadb/gui/env && \
-    cd /opt/yottadb/gui/webserver/o && \
-    mumps ../*.m >/dev/null 2>&1 || true
+    cd /opt/yottadb && \
+    git clone https://github.com/shabiel/M-Web-Server.git && \
+    cd M-Web-Server && \
+    mkdir build && \
+    cd build && \
+    cmake ../ && \
+    make && \
+    make install
 
+# Install M-Unit
 RUN . /opt/yottadb/gui/env && \
-    cd /opt/yottadb/gui/munit/o && \
-    mumps ../*.m >/dev/null 2>&1 || true
+    cd /opt/yottadb && \
+    git clone https://github.com/ChristopherEdwards/M-Unit.git && \
+    cd M-Unit && \
+    mkdir build && \
+    cd build && \
+    cmake ../ && \
+    make && \
+    make install
 
+# Install GDE GUI
 RUN . /opt/yottadb/gui/env && \
-    cd /opt/yottadb/gui/o && \
-    mumps ../r/*.m
+    mkdir cmake-build && \
+    cd cmake-build && \
+    cmake ../ && \
+    make && \
+    make install
 
 EXPOSE 8080
 

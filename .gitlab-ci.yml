@@ -24,7 +24,7 @@ munit:
     - docker load -i docker-images/app.tar
     - docker run -itd -p 8080:8080 --name ydbgui yottadb/yottadbgui:latest
     - sleep 10
-    - docker exec -t ydbgui bash -c 'source ./env && mumps -run ^GDEWEBT'
+    - docker exec -t ydbgui bash -c 'source ./env && ydb_routines="r $ydb_routines" mumps -run ^GDEWEBT'
 
 artifact:
   stage: push

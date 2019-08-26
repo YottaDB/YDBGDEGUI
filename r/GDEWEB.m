@@ -29,14 +29,13 @@ WEB(portnum,ssl,userpass)
 	. s args(i)=$p($zcmdline," ",i)
 	; port number
 	i $l($g(args(1)))&($g(args(1))=+$g(args(1))) s portnum=args(1)
-	e  s portnum=""
 	; ssl/tls config
 	i $l($g(args(2))) s ssl=args(2)
 	; admin username/password
 	i $l($g(args(3))) s userpass=args(3)
 	;
 	; Get the port number to run on
-	i '$l(portnum)  w "No port number specified, or invalid - using default of 8080",!
+	i '$l($g(portnum))  w "No port number specified, or invalid - using default of 8080",!
 	;
 	; If we have no ssl flag quit (explicit configuration of SSl/TLS vs plain text)
 	i $g(ssl)="" w "SSL/TLS is not explicitly disabled or enabled. You must explicitly configure this!",!,"Quitting...",! quit

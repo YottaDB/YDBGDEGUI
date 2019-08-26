@@ -10,9 +10,6 @@
 #								#
 #################################################################
 
-mkdir -p /opt/yottadb/gui/o
-mkdir -p /opt/yottadb/gui/webserver/o
-mkdir -p /opt/yottadb/gui/munit/o
 mkdir -p /opt/yottadb/gui/g
 mkdir -p /opt/yottadb/gui/j
 mkdir -p /opt/yottadb/gui/log
@@ -21,12 +18,18 @@ mkdir -p /opt/yottadb/gui/tmp
 export USER=root
 export ydb_dist=/opt/yottadb/current
 export ydb_tmp=/opt/yottadb/gui/tmp
-export ydb_routines="/opt/yottadb/gui/o(/opt/yottadb/gui/r) /opt/yottadb/gui/webserver/o(/opt/yottadb/gui/webserver) /opt/yottadb/gui/munit/o(/opt/yottadb/gui/munit) /opt/yottadb/current/libyottadbutil.so"
+export ydb_routines="/opt/yottadb/current/plugin/o/ydbgui.so  /opt/yottadb/current/plugin/o/ydbmwebserver.so /opt/yottadb/current/plugin/o/_ydbmunit.so /opt/yottadb/current/libyottadbutil.so"
 export ydb_gbldir=/opt/yottadb/gui/g
 export ydb_log=/opt/yottadb/gui/log
 export ydb_crypt_config=/opt/yottadb/gui/ydbgui.ydbcrypt
 export ydb_icu_version=$(icu-config --version)
-export ydb_tls_passwd_ydbgui="$(echo ydbgui | $ydb_dist/plugin/gtmcrypt/maskpass | cut -d ":" -f2 | tr -d '[:space:]')"
+if [ -f $ydb_dist/plugin/gtmcrypt/maskpass ]; then
+        export ydb_tls_passwd_ydbgui="$(echo ydbgui | $ydb_dist/plugin/gtmcrypt/maskpass | cut -d ":" -f2 | tr -d '[:space:]')"
+fi
 export ydb_lct_stdnull=1
+
+if [ -f $HOME/.nvm/nvm.sh ]; then
+        . $HOME/.nvm/nvm.sh
+fi
 
 export PATH=$PATH:/opt/yottadb/current
