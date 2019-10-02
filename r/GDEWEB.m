@@ -18,7 +18,7 @@
 ; @example
 ; d WEB^GDEWEB(9080)
 ;
-WEB(portnum,ssl,userpass)
+WEB(portnum,ssl,gzip,userpass)
 	; Sanity check env vars to make sure GDE works as intended
 	i (+$ztrnlnm("ydb_local_collate")'=0) w "Local collation environment variable (ydb_local_collate) must be 0" quit
 	i (+$ztrnlnm("ydb_lct_stdnull")'=1) w "Standard null collation environment variable (ydb_lct_stdnull) must be 1" quit
@@ -31,8 +31,10 @@ WEB(portnum,ssl,userpass)
 	i $l($g(args(1)))&($g(args(1))=+$g(args(1))) s portnum=args(1)
 	; ssl/tls config
 	i $l($g(args(2))) s ssl=args(2)
+	; gzip disable
+	i $l($g(args(3))) s gzip=args(3)
 	; admin username/password
-	i $l($g(args(3))) s userpass=args(3)
+	i $l($g(args(4))) s userpass=args(4)
 	;
 	; Get the port number to run on
 	i '$l($g(portnum))  w "No port number specified, or invalid - using default of 8080",!
@@ -48,13 +50,17 @@ WEB(portnum,ssl,userpass)
 	i ((ssl="nossl")!(ssl="NOSSL")!(ssl=0)) s ssl=0 w "SSL configuration NOT found!",!
 	i 'ssl w "WARNING: Web server started without SSL/TLS",!
 	;
+	; set the GZIP flag
+	i ((gzip="nogzip")!(gzip="NOGZIP")!(gzip=0)) s gzip=0 w "GZIP compression disabled",!
+	e  s gzip=1
+	;
 	; Make sure userpass argument is valid
 	i $l($g(userpass))&($g(userpass)'[":") w "userpass argument must be in username:password format!",!,$g(userpass),!,"Quitting...",! quit
 	;
 	; Start the web server
 	i $l($t(^%webreq)) d
 	. w "Starting Web Server...",!
-	. d job^%webreq($g(portnum,8080),$s(ssl:"ydbgui",1:""),1,$g(userpass))
+	. d job^%webreq($g(portnum,8080),$s(ssl:"ydbgui",1:""),1,$g(userpass),gzip)
 	e  d
 	. w "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
 	quit
