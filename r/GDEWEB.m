@@ -32,7 +32,7 @@ WEB(portnum,ssl,gzip,userpass)
 	; ssl/tls config
 	i $l($g(args(2))) s ssl=args(2)
 	; gzip disable
-	i $l($g(args(3))) s gzip=args(3)
+	i $l($g(args(3))) s gzipdisable=args(3)
 	; admin username/password
 	i $l($g(args(4))) s userpass=args(4)
 	;
@@ -51,8 +51,8 @@ WEB(portnum,ssl,gzip,userpass)
 	i 'ssl w "WARNING: Web server started without SSL/TLS",!
 	;
 	; set the GZIP flag
-	i ((gzip="nogzip")!(gzip="NOGZIP")!(gzip=0)) s gzip=0 w "GZIP compression disabled",!
-	e  s gzip=1
+	i ((gzip="nogzip")!(gzip="NOGZIP")!(gzip=1)) s gzipdisable=1 w "GZIP compression disabled",!
+	e  s gzipdisable=0
 	;
 	; Make sure userpass argument is valid
 	i $l($g(userpass))&($g(userpass)'[":") w "userpass argument must be in username:password format!",!,$g(userpass),!,"Quitting...",! quit
@@ -60,7 +60,7 @@ WEB(portnum,ssl,gzip,userpass)
 	; Start the web server
 	i $l($t(^%webreq)) d
 	. w "Starting Web Server...",!
-	. d job^%webreq($g(portnum,8080),$s(ssl:"ydbgui",1:""),1,$g(userpass),gzip)
+	. d job^%webreq($g(portnum,8080),$s(ssl:"ydbgui",1:""),1,$g(userpass),gzipdisable)
 	e  d
 	. w "Web server code not found in $zroutines, please make sure $zroutines is set correctly!",!
 	quit
