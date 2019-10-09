@@ -10,7 +10,7 @@
 #								#
 #################################################################
 
-FROM yottadb/yottadb-base:latest
+FROM yottadb/yottadb-base:latest-master
 
 WORKDIR /opt/yottadb/gui
 COPY . /opt/yottadb/gui

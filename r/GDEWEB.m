@@ -759,7 +759,7 @@ createnamearray(name)
 	. . . i (subcnt=(NAMEsubs-1)) s sub=nullsub q  ; if right side of range is empty, replace with null subscript
 	. i (sub="") d message^GDE(gdeerr("NAMSUBSEMPTY"),""""_subcnt_"""") ; null subscript
 	. s c=$ze(sub,1)
-	. i (c="""")!(c="$") set sub=$$strsub^GDEPARSE(sub,subcnt)	; string subscript
+	. i (c="""")!(c="$") set sub=$$STRSUB^GDEPARSE(sub,subcnt)	; string subscript
 	. e  set sub=$$numsub^GDEPARSE(sub,subcnt)			; numeric subscript
 	. i (NAMEtype="RANGE")&(subcnt=(NAMEsubs-2)) s rangeprefix=NAME,lsub=sub
 	. s NAME("SUBS",subcnt)=sub,NAME=NAME_sub,j=k

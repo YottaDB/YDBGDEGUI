@@ -294,6 +294,16 @@ verify	;; @TEST Verify web service
 	d ASSERT("%GDE-E-QUALREQD, Access method required",$g(JSON("errors",1)),"Receved incorrect error from invalid access method")
 	d ASSERT(0,$d(JSON("errors",2)),"Receved too many errors from invalid access method")
 	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from invalid access method")
+	;
+	; string subscript mapping
+	k BODY,RESULT,ERR,HTTPERR,^TMP("HTTPERR",$J),JSON
+	s BODY="{""names"":{""ZZYOTTADB1(\""OFF\"")"":""ZZYOTTADB""},""regions"":{""ZZYOTTADB"":{""DYNAMIC_SEGMENT"":""ZZYOTTADB""}},""segments"":{""ZZYOTTADB"":{""FILE_NAME"":""/tmp/zzyottadb.dat"",""ACCESS_METHOD"":""BG""}}}"
+	s RESULT=$$verify^GDEWEB(.ARGS,.BODY,.RESULT)
+	d ASSERT(11,$d(RESULT),"Incorrect Response from string subscript mapping")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
+	d ASSERT(0,$d(ERR),"Unable to decode JSON from string subscript mapping")
+	d ASSERT("",$g(HTTPERR),"Incorrect Response from string subscript mapping")
+	d ASSERT("true",$g(JSON("verifyStatus")),"Invalid verifyStatus from string subscript mapping")
 	QUIT
 	;
 save	;; @TEST save web service
