@@ -1348,7 +1348,7 @@ export default {
           QDBRUNDOWN: false,
           RECORD_SIZE: 256,
           STATS: true,
-          STDNULLCOLL: false,
+          STDNULLCOLL: true,
         },
       },
     };
@@ -1567,7 +1567,7 @@ export default {
             QDBRUNDOWN: false,
             RECORD_SIZE: 256,
             STATS: true,
-            STDNULLCOLL: false,
+            STDNULLCOLL: true,
           },
         };
         self.boundItem = null;
