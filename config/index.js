@@ -10,7 +10,39 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      // proxy all requests starting with /get
+      '/get': {
+        target: 'https://localhost:8089',
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {}
+      },
+      '/verify': {
+        target: 'https://localhost:8089',
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {}
+      },
+      '/save': {
+        target: 'https://localhost:8089',
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {}
+      },
+      '/add': {
+        target: 'https://localhost:8089',
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {}
+      },
+      '/delete': {
+        target: 'https://localhost:8089',
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {}
+      }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST

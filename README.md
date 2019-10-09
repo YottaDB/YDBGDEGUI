@@ -134,6 +134,10 @@ The YottaDB Global Directory GUI is built using [vue.js](https://vuejs.org/). It
 # install dependencies
 npm install
 
+# build for local development with hot reload
+# THIS ASSUMES THAT YOU HAVE THE M-WEB-SERVER/APIS running on https://localhost:8089
+npm run dev
+
 # build for production with minification
 npm run build
 
