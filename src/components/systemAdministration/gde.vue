@@ -31,8 +31,12 @@
           @click="filter = ''">Clear</b-btn>
       </b-col>
       <b-col offset="4">
-        <b-btn @click="advanced = !advanced">Advanced</b-btn>
-        <b-btn @click="savedata">Save</b-btn>
+        <b-btn
+          :pressed.sync="advancedToggle"
+          @click="advanced = !advanced">Advanced</b-btn>
+        <b-btn
+          :pressed.sync="savedToggle"
+          @click="savedata">Save</b-btn>
         <b-btn v-b-modal.modalAdd>Add</b-btn>
       </b-col>
     </b-row>
@@ -1243,7 +1247,9 @@ export default {
         segments: [],
       },
       saved: true,
+      savedToggle: false,
       advanced: false,
+      advancedToggle: false,
       items: [],
       regionItems: [],
       segmentItems: [],
@@ -1653,6 +1659,7 @@ export default {
       let item;
       const self = this;
       self.saved = false;
+      self.savedToggle = !self.saved;
 
       // Move data from the modal to the correct object behind the scenes
       switch (type) {
@@ -1696,6 +1703,8 @@ export default {
       let index = 0;
       let unsavedItemsIndex = 0;
       self.saved = false;
+      self.savedToggle = !self.saved;
+
       switch (type) {
         case 'name':
           unsavedItemsIndex = self.unsavedItems.names.findIndex(name => name === item.name);
@@ -1847,6 +1856,7 @@ export default {
           self.verified = true;
           self.modified = false;
           self.saved = true;
+          self.savedToggle = !self.saved;
           self.fromSave = false;
           self.unsavedItems = {
             names: [],
@@ -1862,6 +1872,7 @@ export default {
           self.errors = JSON.stringify(error);
         }
         self.saved = false;
+        self.saved = !self.saved;
         self.verified = false;
         self.$refs.modalError.show();
       });
@@ -1889,5 +1900,9 @@ export default {
   color: #fff;
   background-color: #c82333;
   border-color: #bd2130;
+}
+.btn-secondary.active {
+  background-color: #f77825 !important;
+  border-color: #f77825 !important;
 }
 </style>
