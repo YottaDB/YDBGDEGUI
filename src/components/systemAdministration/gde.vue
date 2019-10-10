@@ -58,8 +58,6 @@
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           :sort-direction="sortDirection"
-          stacked="md"
-          responsive="false"
           show-empty>
           <template
             slot="actions"
@@ -113,8 +111,6 @@
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           :sort-direction="sortDirection"
-          stacked="md"
-          responsive="false"
           show-empty>
           <template
             slot="actions"
@@ -227,8 +223,6 @@
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           :sort-direction="sortDirection"
-          stacked="md"
-          responsive="false"
           show-empty>
           <template
             slot="actions"
