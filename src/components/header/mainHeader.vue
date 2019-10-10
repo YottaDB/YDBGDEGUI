@@ -17,7 +17,7 @@
       <b-row id="navholder">
         <b-navbar
           id="main-nav"
-          toggleable>
+          toggleable="md">
           <b-navbar-brand
             id="main-logo"
             href="/">
