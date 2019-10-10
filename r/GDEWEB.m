@@ -18,7 +18,7 @@
 ; @example
 ; d WEB^GDEWEB(9080)
 ;
-WEB(portnum,ssl,gzip,userpass)
+WEB(portnum,ssl,gzipdisable,userpass)
 	; Sanity check env vars to make sure GDE works as intended
 	i (+$ztrnlnm("ydb_local_collate")'=0) w "Local collation environment variable (ydb_local_collate) must be 0" quit
 	i (+$ztrnlnm("ydb_lct_stdnull")'=1) w "Standard null collation environment variable (ydb_lct_stdnull) must be 1" quit
@@ -51,7 +51,7 @@ WEB(portnum,ssl,gzip,userpass)
 	i 'ssl w "WARNING: Web server started without SSL/TLS",!
 	;
 	; set the GZIP flag
-	i ((gzip="nogzip")!(gzip="NOGZIP")!(gzip=1)) s gzipdisable=1 w "GZIP compression disabled",!
+	i ((gzipdisable="nogzip")!(gzipdisable="NOGZIP")!(gzipdisable=1)) s gzipdisable=1 w "GZIP compression disabled",!
 	e  s gzipdisable=0
 	;
 	; Make sure userpass argument is valid
