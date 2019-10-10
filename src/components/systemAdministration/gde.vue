@@ -808,7 +808,8 @@
                 id="name"
                 ref="infoName"
                 v-model="selectedItem.name.NAME"
-                :value="selectedItem.name.NAME"/>
+                :value="selectedItem.name.NAME"
+                disabled/>
             </b-col>
             <!-- Row Break -->
             <div class="w-100"/>
