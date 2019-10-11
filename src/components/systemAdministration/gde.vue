@@ -1752,21 +1752,6 @@ export default {
           break;
       }
     },
-    deletedata() {
-      const self = this;
-      return axios({
-        method: 'POST',
-        url: '/delete',
-        data: self.deletedItems,
-      }).then((result) => {
-        if (result.data.verifyStatus) {
-          self.deletedItems = [];
-        } else {
-          self.errors = JSON.stringify(result.data);
-          self.$refs.modalError.show();
-        }
-      });
-    },
     getdata() {
       const self = this;
       axios({
@@ -1833,9 +1818,6 @@ export default {
     },
     async savedata() {
       const self = this;
-      if (self.deletedItems.length > 0) {
-        await self.deletedata();
-      }
       axios({
         method: 'POST',
         url: '/save',
@@ -1843,8 +1825,10 @@ export default {
           names: self.names,
           regions: self.regions,
           segments: self.segments,
+          deletedItems: self.deletedItems,
         },
       }).then((result) => {
+        self.deletedItems = [];
         self.fromSave = true;
         if (result.data.verifyStatus) {
           self.getdata();
@@ -1863,6 +1847,7 @@ export default {
         self.fromSave = false;
         return Promise.reject(result.data.errors);
       }).catch((error) => {
+        self.deletedItems = [];
         if (!self.errors) {
           self.errors = JSON.stringify(error);
         }

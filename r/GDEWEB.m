@@ -296,6 +296,14 @@ save(ARGS,BODY,RESULT)
 	; Convert boolean to integer
 	d booltoint(.JSON)
 	;
+	; Delete items from the global directory
+	n i,item
+	s i=0
+	f  s i=$o(JSON("deletedItems",i)) q:i=""  d
+	. k item
+	. m item=JSON("deletedItems",i)
+	. d deleteone(.item)
+	;
 	; Names:
 	m nams=JSON("names")
 	s x="" f  s x=$o(nams(x)) q:x=""  d

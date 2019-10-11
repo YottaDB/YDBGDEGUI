@@ -409,6 +409,35 @@ save	;; @TEST save web service
 	d ASSERT("%GDE-E-QUALREQD, Access method required",$g(JSON("errors",1)),"Receved incorrect error from invalid access method")
 	d ASSERT(0,$d(JSON("errors",2)),"Receved too many errors from invalid access method")
 	d ASSERT("false",$g(JSON("verifyStatus")),"Invalid verifyStatus from invalid access method")
+	;
+	; delete and add a name in the same transaction
+	k BODY,RESULT,ERR,HTTPERR,^TMP("HTTPERR",$J),JSON
+	s BODY="{""deletedItems"":[{""name"":{""NAME"":""ZZYOTTADB""}}],""names"":{""ZZYOTTADB2"":""ZZYOTTADB""}}"
+	s RESULT=$$save^GDEWEB(.ARGS,.BODY,.RESULT)
+	d ASSERT(11,$d(RESULT),"Incorrect Response from Delete name and add name single transaction")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
+	d ASSERT(0,$d(ERR),"Unable to decode JSON from Delete name and add name single transaction")
+	d ASSERT("",$g(HTTPERR),"Incorrect Response from Delete name and add name single transaction")
+	d ASSERT(0,$d(JSON("errors",1)),"Receved too many errors from Delete name and add name single transaction")
+	d ASSERT("true",$g(JSON("verifyStatus")),"Invalid verifyStatus from Delete name and add name single transaction")
+	;
+	; verify with get to make sure added name is there
+	k ARGS,RESULT,ERR,HTTPERR,JSON,^TMP("HTTPERR",$J)
+	d get^GDEWEB(.RESULT,.ARGS)
+	d ASSERT(10,$d(RESULT),"Incorrect Response from Delete name and add name single transaction verification")
+	d:$d(RESULT) DECODE^%webjson("RESULT","JSON","ERR")
+	d ASSERT(0,$d(ERR),"Unable to decode JSON from Delete name and add name single transaction response")
+	d ASSERT("ZZYOTTADB2",$g(JSON("map",16,"from")),"Unable to find added name from Delete name and add name single transaction verification")
+	d ASSERT("ZZYOTTADB",$g(JSON("map",16,"region")),"Unable to find added name from Delete name and add name single transaction verification")
+	d ASSERT("ZZYOTTADB",$g(JSON("names","ZZYOTTADB1")),"Unable to find added name from Delete name and add name single transaction verification")
+	d ASSERT(10,$d(JSON("regions","ZZYOTTADB")),"Unable to find added region from Delete name and add name single transaction verification")
+	d ASSERT(10,$d(JSON("segments","ZZYOTTADB")),"Unable to find added region from Delete name and add name single transaction verification")
+	;
+	; Reset for delete test
+	k BODY,RESULT,ERR,HTTPERR,^TMP("HTTPERR",$J),JSON
+	s BODY="{""deletedItems"":[{""name"":{""NAME"":""ZZYOTTADB2""}}],""names"":{""ZZYOTTADB"":""ZZYOTTADB""}}"
+	s RESULT=$$save^GDEWEB(.ARGS,.BODY,.RESULT)
+	d ASSERT(11,$d(RESULT),"Incorrect Response from Reset Delete name and add name single transaction")
 	QUIT
 	;
 delete	;; @TEST delete web service
