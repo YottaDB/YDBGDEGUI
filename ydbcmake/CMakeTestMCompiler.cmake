@@ -1,3 +1,15 @@
+#################################################################
+#								#
+# Copyright (c) 2019-2020 YottaDB LLC and/or its subsidiaries.	#
+# All rights reserved.						#
+#								#
+#	This source code contains the intellectual property	#
+#	of its copyright holder(s), and is made available	#
+#	under a license.  If you do not know the terms of	#
+#	the license, please stop and do not read further.	#
+#								#
+#################################################################
+
 # This is free and unencumbered software released into the public domain.
 #
 # Anyone is free to copy, modify, publish, use, compile, sell, or
@@ -23,5 +35,4 @@
 #
 # For more information, please refer to <http://unlicense.org/>
 
-set(CMAKE_MUMPS_COMPILER "@CMAKE_MUMPS_COMPILER@")
-set(CMAKE_MUMPS_SOURCE_FILE_EXTENSIONS m)
+set(CMAKE_M_COMPILER_WORKS 1 CACHE INTERNAL "")

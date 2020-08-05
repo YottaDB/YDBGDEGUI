@@ -13,8 +13,10 @@
  # limitations under the License.
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/ydbcmake/")
+set(M_EMBED_SOURCE TRUE)
+set(M_DYNAMIC_LITERALS TRUE)
 
-project(YDBGUI C MUMPS)
+project(YDBGUI C M)
 cmake_minimum_required(VERSION 2.8)
 
 # Find YottaDB
@@ -55,7 +57,7 @@ SET_TARGET_PROPERTIES(ydbgui PROPERTIES PREFIX "")
 
 install(FILES ${source_files} DESTINATION ${ydb_install_dir}/r/)
 
-if(MUMPS_UTF8_MODE)
+if(M_UTF8_MODE)
   install(TARGETS ydbgui DESTINATION ${ydb_install_dir}/o/utf8)
 else()
   install(TARGETS ydbgui DESTINATION ${ydb_install_dir}/o/)
