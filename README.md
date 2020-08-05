@@ -182,6 +182,16 @@ The acutal implementation in `GDEWEB.m` is documented and contains examples of h
 
 Unit tests are created for all of the entry points in `GDEWEB.m` and the tests live in the routine `GDEWEBT.m` The tests follow M-Unit conventions and also provide more examples of how to use the APIs/Web Services in `GDEWEB.m`. There is also lots of negative/error case testing that is part of the tests performed.
 
+#### YDBCMake
+
+YDBGUI uses the upstream [YDBCMake] repository for building using YottaDB as the M compiler. Any changes to `ydbcmake/` should first be upstreamed to that repository.
+Once the changes are upstreamed, you can merge them into YDBGUI using
+```
+git pull --no-rebase git@gitlab.com:YottaDB/Tools/YDBCMake.git
+```
+
+[YDBCMake]: https://gitlab.com/YottaDB/Tools/YDBCMake
+
 ### Frontend
 
 The front end is a [Vue.js](https://vuejs.org/) application built using [Node.js](https://nodejs.org) and [webpack](https://webpack.js.org/) to create a production application. Using Node.js and webpack allow for easier dependency management and ability to compress/minimize the CSS and JavaScript used for the application. At the end of the webpack build process static HTML, JavaScript, and CSS are generated and Node.js and the rest of the dependency tree are not needed for proper operation - all that is needed is the generated `dist` directory.
