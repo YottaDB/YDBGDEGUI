@@ -1,12 +1,12 @@
 #################################################################
 #								#
-# Copyright (c) 2018-2019 YottaDB LLC and/or its subsidiaries.  #
+# Copyright (c) 2018-2020 YottaDB LLC and/or its subsidiaries.  #
 # All rights reserved.						#
 #								#
-#   This source code contains the intellectual property		#
-#   of its copyright holder(s), and is made available		#
-#   under a license.  If you do not know the terms of		#
-#   the license, please stop and do not read further.		#
+#   This source code contains the intellectual property         #
+#   of its copyright holder(s), and is made available           #
+#   under a license.  If you do not know the terms of           #
+#   the license, please stop and do not read further.           #
 #								#
 #################################################################
 
@@ -18,25 +18,24 @@ COPY . /opt/yottadb/gui
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y \
-      bzip2 \
-      curl \
-      libgcrypt11-dev \
-      libgpgme11-dev \
-      libconfig-dev \
-      libssl-dev \
-      cmake \
-      git \
-      && \
+    bzip2 \
+    curl \
+    libgcrypt11-dev \
+    libgpgme11-dev \
+    libconfig-dev \
+    libssl-dev \
+    cmake \
+    git && \
     apt-get clean
 
 # Install ydb_crypt plugin
 RUN mkdir /tmp/plugin-build && \
-	cd /tmp/plugin-build && \
-	cp /opt/yottadb/current/plugin/gtmcrypt/source.tar . && \
-	tar -xf source.tar && \
-	. /opt/yottadb/gui/env && \
-	make && make install && make clean && \
-	find $ydb_dist/plugin -type f -exec chown root:root {} +
+    cd /tmp/plugin-build && \
+    cp /opt/yottadb/current/plugin/gtmcrypt/source.tar . && \
+    tar -xf source.tar && \
+    . /opt/yottadb/gui/env && \
+    make && make install && make clean && \
+    find $ydb_dist/plugin -type f -exec chown root:root {} +
 
 # Build certificate for SSL/TLS purposes
 #RUN openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout ydbgui.key -out ydbgui.crt -subj /CN=localhost -passout pass:ydbgui
@@ -47,7 +46,7 @@ RUN openssl req -x509 -days 365 -sha256 -in /opt/yottadb/gui/ydbgui.csr -key /op
 
 # Install node.js
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && \
-	. $HOME/.nvm/nvm.sh && \
+    . $HOME/.nvm/nvm.sh && \
     nvm install --lts
 
 # Install M Web Server
@@ -57,7 +56,13 @@ RUN . /opt/yottadb/gui/env && \
     cd M-Web-Server && \
     mkdir build && \
     cd build && \
-    cmake ../ && \
+    cmake .. && \
+    make && \
+    make install && \
+    cd .. && \
+    mkdir build-utf8 && \
+    cd build-utf8 && \
+    cmake -DMUMPS_UTF8_MODE=1 .. && \
     make && \
     make install
 
@@ -68,7 +73,13 @@ RUN . /opt/yottadb/gui/env && \
     cd M-Unit && \
     mkdir build && \
     cd build && \
-    cmake ../ && \
+    cmake .. && \
+    make && \
+    make install && \
+    cd .. && \
+    mkdir build-utf8 && \
+    cd build-utf8 && \
+    cmake -DMUMPS_UTF8_MODE=1 .. && \
     make && \
     make install
 
@@ -76,7 +87,13 @@ RUN . /opt/yottadb/gui/env && \
 RUN . /opt/yottadb/gui/env && \
     mkdir cmake-build && \
     cd cmake-build && \
-    cmake ../ && \
+    cmake .. && \
+    make && \
+    make install && \
+    cd .. && \
+    mkdir cmake-build-utf8 && \
+    cd cmake-build-utf8 && \
+    cmake -DM_UTF8_MODE=1 .. && \
     make && \
     make install
 

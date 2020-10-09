@@ -1,7 +1,7 @@
 #!/bin/bash
 #################################################################
 #								#
-# Copyright (c) 2018 YottaDB LLC and/or its subsidiaries.	#
+# Copyright (c) 2018,2020 YottaDB LLC and/or its subsidiaries.	#
 # All rights reserved.						#
 #								#
 #   This source code contains the intellectual property		#
@@ -12,7 +12,7 @@
 #################################################################
 
 # Basic YottaDB environment setup
-source /opt/yottadb/gui/env
+source /opt/yottadb/gui/env $1
 
 # Setup the initial Global Directory
 /opt/yottadb/current/mumps -run ^GDE < database.gde

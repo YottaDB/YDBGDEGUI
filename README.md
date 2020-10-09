@@ -16,9 +16,28 @@ There is only one exposed port `8080` which all webservices and the GUI itself r
 
 This requires the whole repository to be checked out to build.
 
+Build docker images.
 ```bash
 docker build -t yottadb/yottadbgui:latest .
+```
+
+Create and start docker container.
+```bash
 docker run -itd -p 8089:8080 --name ydbgui yottadb/yottadbgui:latest
+```
+Or in UTF-8 mode.
+```bash
+docker run -itd -p 8089:8080 --name ydbgui yottadb/yottadbgui:latest utf-8
+```
+
+Stop docker container.
+```bash
+docker stop ydbgui
+```
+
+Start docker container.
+```bash
+docker start ydbgui
 ```
 
 To use the GUI go to https://localhost:8089 in a web browser.

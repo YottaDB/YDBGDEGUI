@@ -1,6 +1,6 @@
 #################################################################
 #								#
-# Copyright (c) 2018 YottaDB LLC and/or its subsidiaries.	#
+# Copyright (c) 2018,2020 YottaDB LLC and/or its subsidiaries.	#
 # All rights reserved.						#
 #								#
 #   This source code contains the intellectual property		#
@@ -15,13 +15,19 @@ mkdir -p /opt/yottadb/gui/j
 mkdir -p /opt/yottadb/gui/log
 mkdir -p /opt/yottadb/gui/tmp
 
+dir="" chset=m
+if [ "$1" = "utf-8" -o "$1" = "UTF-8" ]; then
+        dir=/utf8 chset=utf-8
+fi
+
 export USER=root
-export ydb_dist=/opt/yottadb/current
+export ydb_dist=/opt/yottadb/current${dir}
 export ydb_tmp=/opt/yottadb/gui/tmp
-export ydb_routines="/opt/yottadb/current/plugin/o/ydbgui.so  /opt/yottadb/current/plugin/o/ydbmwebserver.so /opt/yottadb/current/plugin/o/_ydbmunit.so /opt/yottadb/current/libyottadbutil.so"
-export ydb_gbldir=/opt/yottadb/gui/g
+export ydb_routines="$ydb_dist/plugin/o${dir}/ydbgui.so $ydb_dist/plugin/o${dir}/ydbmwebserver.so $ydb_dist/plugin/o${dir}/_ydbmunit.so $ydb_dist/libyottadbutil.so"
+export ydb_gbldir=/opt/yottadb/gui/g/database.gld
 export ydb_log=/opt/yottadb/gui/log
 export ydb_crypt_config=/opt/yottadb/gui/ydbgui.ydbcrypt
+export ydb_chset=$chset
 export ydb_icu_version=$(icu-config --version)
 if [ -f $ydb_dist/plugin/gtmcrypt/maskpass ]; then
         export ydb_tls_passwd_ydbgui="$(echo ydbgui | $ydb_dist/plugin/gtmcrypt/maskpass | cut -d ":" -f2 | tr -d '[:space:]')"
@@ -33,3 +39,5 @@ if [ -f $HOME/.nvm/nvm.sh ]; then
 fi
 
 export PATH=$PATH:/opt/yottadb/current
+
+unset dir chset
