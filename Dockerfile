@@ -49,53 +49,36 @@ RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.s
     . $HOME/.nvm/nvm.sh && \
     nvm install --lts
 
-# Install M Web Server
+# Install M Web Server, M-Unit, and GDE GUI for both M and UTF-8 modes
 RUN . /opt/yottadb/gui/env && \
-    cd /opt/yottadb && \
-    git clone https://github.com/shabiel/M-Web-Server.git && \
-    cd M-Web-Server && \
-    mkdir build && \
-    cd build && \
-    cmake .. && \
-    make && \
-    make install && \
-    cd .. && \
-    mkdir build-utf8 && \
-    cd build-utf8 && \
-    cmake -DMUMPS_UTF8_MODE=1 .. && \
-    make && \
-    make install
-
-# Install M-Unit
-RUN . /opt/yottadb/gui/env && \
-    cd /opt/yottadb && \
-    git clone https://github.com/ChristopherEdwards/M-Unit.git && \
-    cd M-Unit && \
-    mkdir build && \
-    cd build && \
-    cmake .. && \
-    make && \
-    make install && \
-    cd .. && \
-    mkdir build-utf8 && \
-    cd build-utf8 && \
-    cmake -DMUMPS_UTF8_MODE=1 .. && \
-    make && \
-    make install
-
-# Install GDE GUI
-RUN . /opt/yottadb/gui/env && \
-    mkdir cmake-build && \
-    cd cmake-build && \
-    cmake .. && \
-    make && \
-    make install && \
-    cd .. && \
-    mkdir cmake-build-utf8 && \
-    cd cmake-build-utf8 && \
-    cmake -DM_UTF8_MODE=1 .. && \
-    make && \
-    make install
+    for pkg in M-Web-Server M-Unit GUI; \
+    do \
+        option=MUMPS && \
+        cd /opt/yottadb && \
+        if [ "$pkg" = "M-Web-Server" ]; \
+        then \
+            git clone https://github.com/shabiel/M-Web-Server.git; \
+            cd $pkg; \
+        elif [ "$pkg" = "M-Unit" ]; \
+        then \
+            git clone https://github.com/ChristopherEdwards/M-Unit.git; \
+            cd $pkg; \
+        else \
+            option=M; \
+            cd /opt/yottadb/gui; \
+        fi && \
+        mkdir cmake-build && \
+        cd cmake-build && \
+        cmake .. && \
+        make && \
+        make install && \
+        cd .. && \
+        mkdir cmake-build-utf8 && \
+        cd cmake-build-utf8 && \
+        cmake -D${option}_UTF8_MODE=1 .. && \
+        make && \
+        make install; \
+    done
 
 EXPOSE 8080
 
