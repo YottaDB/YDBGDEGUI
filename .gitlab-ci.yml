@@ -1,3 +1,15 @@
+#################################################################
+#								#
+# Copyright (c) 2020 YottaDB LLC and/or its subsidiaries.	#
+# All rights reserved.						#
+#								#
+#	This source code contains the intellectual property	#
+#	of its copyright holder(s), and is made available	#
+#	under a license.  If you do not know the terms of	#
+#	the license, please stop and do not read further.	#
+#								#
+#################################################################
+#
 image: docker:latest
 
 services:
@@ -18,16 +30,19 @@ build:
     - docker build --pull -t yottadb/yottadbgui:latest -f Dockerfile .
     - docker save yottadb/yottadbgui:latest > docker-images/app.tar
 
-gpgkey-verify:
+commit-verify:
   image: ubuntu:18.04
   stage: build
   before_script:
     - apt-get update -qq && apt-get install -y -qq git wget gnupg
   script:
     # Copy commit gpg key verify script to build directory and execute
-    - wget https://gitlab.com/YottaDB/DB/YDB/-/raw/master/ci/commit_gpgkey_verify.sh
-    - chmod +x commit_gpgkey_verify.sh
-    - ./commit_gpgkey_verify.sh https://gitlab.com/YottaDB/UI/YDBGDEGUI
+    - wget https://gitlab.com/YottaDB/DB/YDB/-/raw/master/ci/commit_verify.sh
+    - chmod +x commit_verify.sh
+    - ./commit_verify.sh test/needs_copyright.sh
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "external_pull_request" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+
 
 munit:
   stage: test
