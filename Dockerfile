@@ -12,9 +12,6 @@
 
 FROM yottadb/yottadb-base:latest-master
 
-WORKDIR /opt/yottadb/gui
-COPY . /opt/yottadb/gui
-
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y \
@@ -28,6 +25,9 @@ RUN apt-get update && \
     cmake \
     git && \
     apt-get clean
+
+WORKDIR /opt/yottadb/gui
+COPY . /opt/yottadb/gui
 
 # Install ydb_crypt plugin
 RUN mkdir /tmp/plugin-build && \
