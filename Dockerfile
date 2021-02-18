@@ -1,6 +1,6 @@
 #################################################################
 #								#
-# Copyright (c) 2018-2020 YottaDB LLC and/or its subsidiaries.	#
+# Copyright (c) 2018-2021 YottaDB LLC and/or its subsidiaries.	#
 # All rights reserved.						#
 #								#
 #   This source code contains the intellectual property		#
@@ -20,7 +20,8 @@ RUN apt-get update && \
     apt-get install -y \
     bzip2 \
     curl \
-    libgcrypt11-dev \
+    icu-devtools \
+    libgcrypt20-dev \
     libgpgme11-dev \
     libconfig-dev \
     libssl-dev \
@@ -45,7 +46,7 @@ RUN openssl req -new -key /opt/yottadb/gui/ydbgui.key -passin pass:ydbgui -subj 
 RUN openssl req -x509 -days 365 -sha256 -in /opt/yottadb/gui/ydbgui.csr -key /opt/yottadb/gui/ydbgui.key -passin pass:ydbgui -out /opt/yottadb/gui/ydbgui.pem
 
 # Install node.js
-RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && \
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash && \
     . $HOME/.nvm/nvm.sh && \
     nvm install --lts
 

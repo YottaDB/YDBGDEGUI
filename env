@@ -1,6 +1,6 @@
 #################################################################
 #								#
-# Copyright (c) 2018-2020 YottaDB LLC and/or its subsidiaries.	#
+# Copyright (c) 2018-2021 YottaDB LLC and/or its subsidiaries.	#
 # All rights reserved.						#
 #								#
 #   This source code contains the intellectual property		#
@@ -28,7 +28,7 @@ export ydb_gbldir=/opt/yottadb/gui/g/database.gld
 export ydb_log=/opt/yottadb/gui/log
 export ydb_crypt_config=/opt/yottadb/gui/ydbgui.ydbcrypt
 export ydb_chset=$chset
-export ydb_icu_version=$(icu-config --version)
+export ydb_icu_version=$(pkg-config --modversion icu-io)
 if [ -f $ydb_dist/plugin/gtmcrypt/maskpass ]; then
         export ydb_tls_passwd_ydbgui="$(echo ydbgui | $ydb_dist/plugin/gtmcrypt/maskpass | cut -d ":" -f2 | tr -d '[:space:]')"
 fi
